@@ -2356,8 +2356,69 @@ def main():
             # Get theme data
             theme_data = themes[selected_theme]
             
+            # Generate more examples for demonstration purposes (since we only have a few in the original data)
+            # In a real application, you would use the actual complete dataset instead
+            expanded_examples = []
+            
+            # Start with existing examples
+            expanded_examples.extend(theme_data["examples"])
+            
+            # Add more examples based on the theme to simulate a fuller dataset
+            if selected_theme == "Registration Process":
+                expanded_examples.extend([
+                    {"text": "Need a wizard-like interface for first-time users of the registration system", "sentiment": "neutral"},
+                    {"text": "The verification process takes too long; it should be streamlined", "sentiment": "negative"},
+                    {"text": "Too many overlapping requirements across different registration systems", "sentiment": "negative"},
+                    {"text": "I like the recent improvements to user interface on SAM.gov", "sentiment": "positive"},
+                    {"text": "Documentation should explain why certain information is needed", "sentiment": "neutral"},
+                    {"text": "The helpdesk representatives were very helpful during our registration", "sentiment": "positive"}
+                ])
+            elif selected_theme == "Technical Support":
+                expanded_examples.extend([
+                    {"text": "Support wait times are unacceptably long during peak periods", "sentiment": "negative"},
+                    {"text": "Email support responses were thorough and helpful", "sentiment": "positive"},
+                    {"text": "Need more technical support resources specifically for small businesses", "sentiment": "neutral"},
+                    {"text": "Phone support staff seem undertrained on complex technical issues", "sentiment": "negative"},
+                    {"text": "Support documentation should be updated more frequently", "sentiment": "neutral"}
+                ])
+            elif selected_theme == "Documentation Requirements":
+                expanded_examples.extend([
+                    {"text": "Too many different formats required for similar information", "sentiment": "negative"},
+                    {"text": "Examples of properly completed forms would be extremely helpful", "sentiment": "neutral"},
+                    {"text": "Documentation process is becoming more streamlined each year", "sentiment": "positive"},
+                    {"text": "Need better guidance on which documents are truly required vs. optional", "sentiment": "neutral"},
+                    {"text": "The document upload portal is confusing and unreliable", "sentiment": "negative"}
+                ])
+            elif selected_theme == "Cybersecurity Compliance":
+                expanded_examples.extend([
+                    {"text": "The cost of implementing CMMC requirements is prohibitive for small firms", "sentiment": "negative"},
+                    {"text": "Need more affordable options for small businesses to meet cybersecurity requirements", "sentiment": "neutral"},
+                    {"text": "The phased approach to implementing new requirements is helpful", "sentiment": "positive"},
+                    {"text": "Resources provided for cybersecurity assessment were clear and useful", "sentiment": "positive"},
+                    {"text": "Difficult to understand which specific controls apply to our situation", "sentiment": "negative"},
+                    {"text": "Provide templates for creating required security documentation", "sentiment": "neutral"}
+                ])
+            elif selected_theme == "Training & Education":
+                expanded_examples.extend([
+                    {"text": "The procurement training webinars were excellent and very practical", "sentiment": "positive"},
+                    {"text": "Need more hands-on workshops rather than just presentations", "sentiment": "neutral"},
+                    {"text": "Training materials are too general and don't address specific industries", "sentiment": "negative"},
+                    {"text": "Online knowledge base has been extremely helpful for quick questions", "sentiment": "positive"},
+                    {"text": "Make training modules available on-demand instead of scheduled sessions", "sentiment": "neutral"},
+                    {"text": "Trainers often cannot answer specific technical questions", "sentiment": "negative"}
+                ])
+            elif selected_theme == "Communication":
+                expanded_examples.extend([
+                    {"text": "Response time from contracting officers is inconsistent and unpredictable", "sentiment": "negative"},
+                    {"text": "The new notification system has improved communication significantly", "sentiment": "positive"},
+                    {"text": "Need more transparency about where applications are in the review process", "sentiment": "neutral"},
+                    {"text": "Guidelines for how and when to contact contracting officers would be helpful", "sentiment": "neutral"},
+                    {"text": "Automated status updates have been a welcome improvement", "sentiment": "positive"},
+                    {"text": "Communication channels between different agencies are still fragmented", "sentiment": "negative"}
+                ])
+            
             # Apply sentiment filter if not "All"
-            filtered_examples = theme_data["examples"]
+            filtered_examples = expanded_examples
             if selected_sentiment != "All":
                 filtered_examples = [ex for ex in filtered_examples if ex["sentiment"].lower() == selected_sentiment.lower()]
             
@@ -2375,27 +2436,46 @@ def main():
             # Display theme description
             st.markdown(f"<p style='margin-bottom:20px;'>{theme_data['description']}</p>", unsafe_allow_html=True)
             
-            # Begin response grid
-            response_html = '<div class="response-grid">'
+            # Instead of using a single HTML string, we'll create individual cards
+            # to avoid issues with markdown rendering
             
-            # Generate card for each response
+            # Create a multi-column layout for the responses with 2 columns
+            cols = st.columns(2)
+            col_idx = 0
+            
+            # Generate cards for each response
             for example in filtered_examples:
                 response_text = example["text"]
                 sentiment = example["sentiment"].lower()
                 
-                # Create card with sentiment indicator
-                response_html += f"""
-                <div class="response-card">
-                    <div class="sentiment-indicator sentiment-{sentiment}"></div>
-                    <p style="margin:0; font-style:italic;">"{response_text}"</p>
-                </div>
-                """
-            
-            # Close response grid
-            response_html += '</div>'
-            
-            # Display all responses in the grid layout
-            st.markdown(response_html, unsafe_allow_html=True)
+                # Alternate between columns
+                with cols[col_idx]:
+                    # Display sentiment indicator based on sentiment
+                    if sentiment == "positive":
+                        sentiment_icon = "✅"
+                        indicator_color = "#10B981"
+                    elif sentiment == "negative":
+                        sentiment_icon = "❌"
+                        indicator_color = "#EF4444"
+                    else:
+                        sentiment_icon = "⚠️"
+                        indicator_color = "#F59E0B"
+                    
+                    # Create a card with proper styling
+                    st.markdown(
+                        f"""
+                        <div style="background-color: white; border-radius: 5px; padding: 15px; 
+                                 box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; 
+                                 border-left: 4px solid {indicator_color}; margin-bottom: 15px;">
+                            <span style="position: absolute; top: 8px; right: 10px;">{sentiment_icon}</span>
+                            <p style="margin:0; font-style:italic;">"{response_text}"</p>
+                        </div>
+                        """, 
+                        unsafe_allow_html=True
+                    )
+                
+                # Alternate column index (0,1,0,1,etc.)
+                col_idx = (col_idx + 1) % 2
             
             # If no responses match the filter criteria
             if response_count == 0:
