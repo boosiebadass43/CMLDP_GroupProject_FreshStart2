@@ -11,6 +11,96 @@ import logging
 import warnings
 import random
 
+# Set page configuration first, before any other st commands
+st.set_page_config(
+    page_title="Small Business Federal Contracting Dashboard",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Add comprehensive CSS overrides to force light mode
+st.markdown("""
+<style>
+/* Force light mode theme - override Streamlit's theme settings */
+:root {
+    --background-color: #FFFFFF;
+    --secondary-background-color: #F8F9FA;
+    --text-color: #333333;
+    --font: "Source Sans Pro", sans-serif;
+}
+
+/* Main background */
+.stApp {
+    background-color: #FFFFFF !important;
+}
+
+/* Sidebar background */
+.css-1d391kg, .css-12oz5g7, [data-testid="stSidebar"] {
+    background-color: #F8F9FA !important;
+}
+
+/* Text colors */
+.stMarkdown, p, span, label, div, h1, h2, h3, h4, h5, h6 {
+    color: #333333 !important;
+}
+
+/* Ensure metric cards have light background */
+[data-testid="stMetric"] {
+    background-color: #F8F9FA !important;
+    padding: 15px !important;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+/* Chart backgrounds */
+.js-plotly-plot .plotly {
+    background-color: #FFFFFF !important;
+}
+
+/* Input widgets */
+.stSelectbox > div, .stTextInput > div {
+    background-color: #FFFFFF !important;
+}
+
+/* Radio buttons */
+.stRadio > div {
+    background-color: transparent !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: #4B5CFF !important;
+    color: white !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: #F8F9FA !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color: #333333 !important;
+}
+
+/* Data tables */
+.stDataFrame, .stTable {
+    background-color: #FFFFFF !important;
+}
+
+/* Make sure code displays properly */
+code {
+    background-color: #F0F0F0 !important;
+    color: #333333 !important;
+}
+
+/* Override any SVG elements */
+svg text {
+    fill: #333333 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Define global constants
 sentiment_icons = {
     "positive": "✓", 
@@ -24,14 +114,6 @@ logger = logging.getLogger(__name__)
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
-
-# Set page configuration
-st.set_page_config(
-    page_title="Small Business Federal Contracting Dashboard",
-    page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Hard-coded stopwords (from NLTK)
 ENGLISH_STOPWORDS = {
@@ -698,7 +780,11 @@ class SmallBusinessDashboard:
         fig.update_layout(
             height=500,
             yaxis={'categoryorder': 'total ascending'},
-            coloraxis_showscale=False
+            coloraxis_showscale=False,
+            paper_bgcolor='#FFFFFF',
+            plot_bgcolor='#F8F9FA',
+            font=dict(color='#333333'),
+            margin=dict(l=50, r=20, t=50, b=100)
         )
         
         return fig
@@ -740,7 +826,11 @@ class SmallBusinessDashboard:
             fig.update_layout(
                 height=500,
                 yaxis={'categoryorder': 'total ascending'},
-                coloraxis_showscale=False
+                coloraxis_showscale=False,
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333'),
+                margin=dict(l=50, r=20, t=50, b=100)
             )
             
             return fig
@@ -748,7 +838,12 @@ class SmallBusinessDashboard:
             logger.error(f"Error creating barriers chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="No barrier data available")
+            fig.update_layout(
+                title="No barrier data available",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_complexity_by_affiliation_chart(self, filtered_data):
@@ -781,13 +876,23 @@ class SmallBusinessDashboard:
             else:
                 # Create an empty figure
                 fig = go.Figure()
-                fig.update_layout(title="No complexity data available")
+                fig.update_layout(
+                    title="No complexity data available",
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333')
+                )
                 return fig
         except Exception as e:
             logger.error(f"Error creating complexity chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="Error creating complexity chart")
+            fig.update_layout(
+                title="Error creating complexity chart",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_timeline_distribution_chart(self, filtered_data):
@@ -828,20 +933,34 @@ class SmallBusinessDashboard:
                 
                 fig.update_layout(
                     height=400,
-                    coloraxis_showscale=False
+                    coloraxis_showscale=False,
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333'),
+                    margin=dict(l=50, r=20, t=50, b=100)
                 )
                 
                 return fig
             else:
                 # Create an empty figure
                 fig = go.Figure()
-                fig.update_layout(title="No timeline data available")
+                fig.update_layout(
+                    title="No timeline data available",
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333')
+                )
                 return fig
         except Exception as e:
             logger.error(f"Error creating timeline chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="Error creating timeline chart")
+            fig.update_layout(
+                title="Error creating timeline chart",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_needed_resources_chart(self, filtered_data):
@@ -906,7 +1025,12 @@ class SmallBusinessDashboard:
             logger.error(f"Error creating resources chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="No resource data available")
+            fig.update_layout(
+                title="No resource data available",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_challenging_factors_chart(self, filtered_data):
@@ -1061,7 +1185,12 @@ class SmallBusinessDashboard:
             logger.error(f"Error creating factors chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="No factor data available")
+            fig.update_layout(
+                title="No factor data available",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_simplification_chart(self, filtered_data):
@@ -1082,7 +1211,11 @@ class SmallBusinessDashboard:
                 )
                 
                 fig.update_layout(
-                    height=500
+                    height=500,
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333'),
+                    margin=dict(l=50, r=20, t=50, b=100)
                 )
                 
                 fig.update_traces(
@@ -1094,13 +1227,23 @@ class SmallBusinessDashboard:
             else:
                 # Create an empty figure
                 fig = go.Figure()
-                fig.update_layout(title="No simplification data available")
+                fig.update_layout(
+                    title="No simplification data available",
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333')
+                )
                 return fig
         except Exception as e:
             logger.error(f"Error creating simplification chart: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="Error creating simplification chart")
+            fig.update_layout(
+                title="Error creating simplification chart",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
     
     def create_word_cloud_data(self, filtered_data):
@@ -1335,13 +1478,23 @@ class SmallBusinessDashboard:
             else:
                 # Create an empty figure
                 fig = go.Figure()
-                fig.update_layout(title="No correlation data available")
+                fig.update_layout(
+                    title="No correlation data available",
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#333333')
+                )
                 return fig
         except Exception as e:
             logger.error(f"Error creating correlation heatmap: {str(e)}")
             # Create an empty figure
             fig = go.Figure()
-            fig.update_layout(title="Error creating correlation heatmap")
+            fig.update_layout(
+                title="Error creating correlation heatmap",
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font=dict(color='#333333')
+            )
             return fig
 
 # Main application UI
@@ -2141,20 +2294,20 @@ def main():
                 row=1, col=2
             )
             
-            # Update layout with dark mode compatibility
+            # Update layout with light mode styling
             fig.update_layout(
                 height=500,
                 showlegend=False,
-                paper_bgcolor='#1E1E1E',  # Dark paper background
-                plot_bgcolor='#1E1E1E',   # Dark plot background
-                font={'color': '#E0E0E0'}, # Light text for dark background
-                margin={'l': 50, 'r': 50, 't': 70, 'b': 70},
-                xaxis={'tickfont': {'color': '#E0E0E0'}, 'gridcolor': '#444444'},
-                yaxis={'tickfont': {'color': '#E0E0E0'}, 'gridcolor': '#444444'}
+                paper_bgcolor='#FFFFFF',  # White paper background
+                plot_bgcolor='#F8F9FA',   # Light plot background
+                font={'color': '#333333', 'size': 12}, # Dark text for light background
+                margin={'l': 50, 'r': 20, 't': 50, 'b': 100},
+                xaxis={'tickfont': {'color': '#333333'}, 'gridcolor': '#F0F0F0'},
+                yaxis={'tickfont': {'color': '#333333'}, 'gridcolor': '#F0F0F0'}
             )
             
-            # Update subplot titles for dark mode
-            fig.update_annotations(font_color='#E0E0E0')
+            # Update subplot titles for light mode
+            fig.update_annotations(font_color='#333333')
             
             # Display the figure
             st.plotly_chart(fig, use_container_width=True)
