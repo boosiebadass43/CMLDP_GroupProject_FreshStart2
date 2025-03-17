@@ -2733,10 +2733,12 @@ def main():
                     </div>
                     
                     <style>
-                    .theme-{theme_class} {{
-                        --theme-color: {'registration': '#0066cc', 'technical': '#00a3cc', 'documentation': '#00cc66', 
-                                       'cybersecurity': '#ff9900', 'training': '#cc3300', 'communication': '#9900cc'}['{theme_class}'];
-                    }}
+                    .theme-registration {{ --theme-color: #0066cc; }}
+                    .theme-technical {{ --theme-color: #00a3cc; }}
+                    .theme-documentation {{ --theme-color: #00cc66; }}
+                    .theme-cybersecurity {{ --theme-color: #ff9900; }}
+                    .theme-training {{ --theme-color: #cc3300; }}
+                    .theme-communication {{ --theme-color: #9900cc; }}
                     </style>
                     """, unsafe_allow_html=True)
     
