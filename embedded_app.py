@@ -173,9 +173,39 @@ li {
     margin-bottom: 1.5rem !important;
 }
 
-/* Chart spacing */
+/* Chart spacing and responsiveness */
 .js-plotly-plot {
     margin-bottom: 1.5rem !important;
+}
+
+/* Fix chart toolbar overlap with title on small screens */
+.js-plotly-plot .plotly .modebar-container {
+    top: 5px !important;
+}
+
+/* Additional spacing for chart titles on small screens */
+@media screen and (max-width: 768px) {
+    .js-plotly-plot .plotly .gtitle {
+        margin-top: 10px !important;
+    }
+    
+    .js-plotly-plot .plotly .modebar-container {
+        top: 10px !important;
+    }
+}
+
+/* Chart container class for better spacing */
+.chart-container {
+    margin-top: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    padding-top: 0.5rem !important;
+}
+
+/* Responsive chart adjustments */
+@media screen and (max-width: 992px) {
+    .chart-container .stPlotlyChart {
+        padding-top: 1rem !important;
+    }
 }
 
 /* ========== SIDEBAR OPTIMIZATION ========== */
@@ -1124,13 +1154,15 @@ class SmallBusinessDashboard:
             title={
                 'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
                 'x': 0.5,
-                'xanchor': 'center'
+                'xanchor': 'center',
+                'y': 0.95,
+                'yanchor': 'top'
             },
             coloraxis_showscale=False,
             paper_bgcolor='#FFFFFF',
             plot_bgcolor='#F8F9FA',
             font=dict(color='#000000', family='Arial, sans-serif', size=14),
-            margin=dict(l=50, r=20, t=50, b=100),
+            margin=dict(l=50, r=20, t=80, b=100),
             transition_duration=500
         )
         
@@ -1184,13 +1216,15 @@ class SmallBusinessDashboard:
                 title={
                     'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
                     'x': 0.5,
-                    'xanchor': 'center'
+                    'xanchor': 'center',
+                    'y': 0.95,
+                    'yanchor': 'top'
                 },
                 coloraxis_showscale=False,
                 paper_bgcolor='#FFFFFF',
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#000000', family='Arial, sans-serif', size=14),
-                margin=dict(l=50, r=20, t=50, b=100),
+                margin=dict(l=50, r=20, t=80, b=100),
                 transition_duration=500
             )
             
@@ -1322,13 +1356,15 @@ class SmallBusinessDashboard:
                     title={
                         'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
                         'x': 0.5,
-                        'xanchor': 'center'
+                        'xanchor': 'center',
+                        'y': 0.95,
+                        'yanchor': 'top'
                     },
                     coloraxis_showscale=False,
                     paper_bgcolor='#FFFFFF',
                     plot_bgcolor='#F8F9FA',
                     font=dict(color='#000000', family='Arial, sans-serif', size=14),
-                    margin=dict(l=50, r=20, t=50, b=100),
+                    margin=dict(l=50, r=20, t=80, b=100),
                     transition_duration=500
                 )
                 
@@ -1613,7 +1649,7 @@ class SmallBusinessDashboard:
                     paper_bgcolor='#FFFFFF',
                     plot_bgcolor='#F8F9FA',
                     font=dict(color='#333333'),
-                    margin=dict(l=50, r=20, t=50, b=100)
+                    margin=dict(l=50, r=20, t=80, b=100)
                 )
                 
                 fig.update_traces(
@@ -2564,6 +2600,7 @@ def main():
                       "The charts below illustrate the most significant barriers and hurdles reported by survey respondents.")
         
         # Visualizations for tab 1 with container for consistent spacing
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         
         with col1:
@@ -2571,6 +2608,7 @@ def main():
             
         with col2:
             st.plotly_chart(dashboard.create_barriers_chart(filtered_data), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
             
         # Add vertical space after visualizations
         add_vertical_space(2)
@@ -2678,7 +2716,9 @@ def main():
         st.markdown("*Interact with the chart to explore details. Hover over bars for exact counts and percentages.*")
         
         # Challenging factors horizontal bar chart with improved formatting
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         st.plotly_chart(dashboard.create_challenging_factors_chart(filtered_data), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Add vertical spacing between sections
         st.markdown('<div style="margin-top: 30px; margin-bottom: 30px;"></div>', unsafe_allow_html=True)
@@ -2701,7 +2741,9 @@ def main():
         st.markdown("- Hover over areas to see exact counts and percentages")
         
         # Needed resources chart
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         st.plotly_chart(dashboard.create_needed_resources_chart(filtered_data), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Add vertical spacing between sections
         st.markdown('<div style="margin-top: 30px; margin-bottom: 30px;"></div>', unsafe_allow_html=True)
