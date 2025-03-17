@@ -2529,7 +2529,7 @@ def main():
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                                 padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{cleaned_resource}</div>
+                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{cleaned_resource}</div>
                         <div style="color: #666; font-size: 0.9rem;">{percentage}% of resource mentions</div>
                     </div>
                     """, unsafe_allow_html=True)
