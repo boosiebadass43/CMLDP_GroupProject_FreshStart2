@@ -1589,16 +1589,44 @@ def main():
         overflow-wrap: break-word !important;
     }
 
-    /* Executive Summary overflow */
-    .st-ae {
-        overflow-y: auto !important;
-        max-height: 600px !important;
+    /* Fix Executive Summary expander */
+    .streamlit-expanderHeader {
+        font-size: 1.2rem !important;
+        font-weight: 600 !important;
     }
 
-    /* Scrollable overflow for long sections */
-    .stExpander {
-        overflow-y: auto !important;
-        max-height: 80vh !important;
+    /* Ensure the expander content has proper spacing */
+    .streamlit-expanderContent {
+        padding: 10px 0 !important;
+        overflow: visible !important;
+    }
+
+    /* Fix text wrapping and prevent overflow */
+    .streamlit-expanderContent p, 
+    .streamlit-expanderContent ul, 
+    .streamlit-expanderContent ol,
+    .streamlit-expanderContent div {
+        overflow-wrap: break-word !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        white-space: normal !important;
+        max-width: 100% !important;
+    }
+
+    /* Add proper spacing between elements in the expander */
+    .streamlit-expanderContent h1, 
+    .streamlit-expanderContent h2, 
+    .streamlit-expanderContent h3, 
+    .streamlit-expanderContent h4, 
+    .streamlit-expanderContent h5 {
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Ensure container grows with content */
+    [data-testid="stExpander"] {
+        max-height: none !important;
+        overflow: visible !important;
     }
 
     /* Sentiment indicators */
@@ -1836,28 +1864,29 @@ def main():
     # Application header
     st.markdown('<div class="main-header">📊 Small Business Federal Contracting Dashboard</div>', unsafe_allow_html=True)
     
-    # Executive summary in an expandable section
-    with st.expander("📋 Executive Summary", expanded=True):
+    # Executive Summary toggle with dynamic sizing
+    with st.expander("📋 Executive Summary", expanded=False):
         st.markdown(f"""
-        <div class="card">
-        <h3>Key Insights for Policy Makers</h3>
-        <p>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify 
-        challenges facing small businesses during the onboarding process for federal contracts.</p>
-        
-        <div class="insight-box">
-            <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
-            understanding where to begin, and meeting cybersecurity requirements.
-        </div>
-        
-        <div class="insight-box">
-            <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
-            indicating significant onboarding barriers.
-        </div>
-        
-        <div class="insight-box">
-            <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
-            is the most requested resource across all stakeholder groups.
-        </div>
+        <div style="padding: 10px 0;">
+            <h3 style="margin-bottom: 15px;">Key Insights for Policy Makers</h3>
+            
+            <p style="margin-bottom: 10px;">This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify 
+            challenges facing small businesses during the onboarding process for federal contracts.</p>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
+                understanding where to begin, and meeting cybersecurity requirements.
+            </div>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
+                indicating significant onboarding barriers.
+            </div>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
+                is the most requested resource across all stakeholder groups.
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
