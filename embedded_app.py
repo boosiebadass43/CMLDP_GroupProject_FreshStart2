@@ -54,6 +54,25 @@ def card_container(content_function):
         content_function()
         st.markdown("</div>", unsafe_allow_html=True)
 
+# Helper function for mobile-friendly chart rendering
+def render_mobile_chart(fig, use_container_width=True):
+    """Render a plotly chart with mobile-friendly configuration
+    
+    This function applies mobile-friendly configuration to a plotly chart.
+    """
+    # Apply mobile-friendly settings
+    mobile_fig = configure_chart_for_mobile(fig)
+    
+    # Use additional config options for better mobile experience
+    config = {
+        'scrollZoom': False,
+        'displayModeBar': 'hover',
+        'responsive': True
+    }
+    
+    # Render the chart with the improved config
+    return st.plotly_chart(mobile_fig, use_container_width=use_container_width, config=config)
+
 # Add comprehensive CSS for spacing, visual hierarchy, and layout balance
 st.markdown("""
 <style>
@@ -676,7 +695,11 @@ ENGLISH_STOPWORDS = {
 
 # Mobile-optimized chart configuration
 def configure_chart_for_mobile(fig):
-    """Apply mobile-friendly settings to Plotly charts"""
+    """Apply mobile-friendly settings to Plotly charts
+    
+    This version doesn't try to set the config property directly,
+    which would cause an AttributeError on some Plotly versions.
+    """
     fig.update_layout(
         # More margin at top for toolbar
         margin=dict(t=80, r=20, b=60, l=40),
@@ -700,18 +723,13 @@ def configure_chart_for_mobile(fig):
         
         # Mobile-friendly title positioning
         title=dict(
-            y=0.9,  # Position title lower to avoid toolbar
+            y=0.95,  # Position title lower to avoid toolbar
             x=0.5,
             font=dict(size=14)
         )
     )
     
-    # Add custom dragmode setting for better mobile touch
-    fig.update_config(
-        scrollZoom=False,  # Disable scroll zooming on mobile
-        displayModeBar='hover'  # Show toolbar only on hover
-    )
-    
+    # Return the figure without attempting to modify its config
     return fig
 
 # Main application class
@@ -2874,10 +2892,10 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.plotly_chart(dashboard.create_hurdles_chart(filtered_data), use_container_width=True)
+            render_mobile_chart(dashboard.create_hurdles_chart(filtered_data))
             
         with col2:
-            st.plotly_chart(dashboard.create_barriers_chart(filtered_data), use_container_width=True)
+            render_mobile_chart(dashboard.create_barriers_chart(filtered_data))
         st.markdown('</div>', unsafe_allow_html=True)
             
         # Add vertical space after visualizations
@@ -2891,10 +2909,10 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.plotly_chart(dashboard.create_complexity_by_affiliation_chart(filtered_data), use_container_width=True)
+            render_mobile_chart(dashboard.create_complexity_by_affiliation_chart(filtered_data))
             
         with col2:
-            st.plotly_chart(dashboard.create_timeline_distribution_chart(filtered_data), use_container_width=True)
+            render_mobile_chart(dashboard.create_timeline_distribution_chart(filtered_data))
         st.markdown('</div>', unsafe_allow_html=True)
         
         # End of Key Challenges section - no correlation heatmap
@@ -2987,7 +3005,7 @@ def main():
         
         # Challenging factors horizontal bar chart with improved formatting
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        st.plotly_chart(dashboard.create_challenging_factors_chart(filtered_data), use_container_width=True)
+        render_mobile_chart(dashboard.create_challenging_factors_chart(filtered_data))
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Add vertical spacing between sections
@@ -3012,7 +3030,7 @@ def main():
         
         # Needed resources chart
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        st.plotly_chart(dashboard.create_needed_resources_chart(filtered_data), use_container_width=True)
+        render_mobile_chart(dashboard.create_needed_resources_chart(filtered_data))
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Add vertical spacing between sections
@@ -3079,8 +3097,8 @@ def main():
             # Update subplot titles for light mode
             fig.update_annotations(font_color='#333333')
             
-            # Display the figure
-            st.plotly_chart(fig, use_container_width=True)
+            # Display the figure with mobile optimization
+            render_mobile_chart(fig)
         except Exception as e:
             st.error(f"Error creating respondent breakdown: {str(e)}")
     
