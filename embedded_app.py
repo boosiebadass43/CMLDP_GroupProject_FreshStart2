@@ -1644,6 +1644,20 @@ def main():
         margin: 0 !important;
         overflow: visible !important;
     }
+    
+    /* Enhanced text readability for analysis sections */
+    .analysis-section + p, 
+    .section-subtitle + p,
+    .section-subtitle + ul,
+    .section-subtitle + ol,
+    p, li {
+        color: #333333 !important;
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 1rem !important;
+        white-space: normal !important;
+        font-family: "Source Sans Pro", sans-serif !important;
+    }
 
     /* Sentiment indicators */
     .sentiment {
@@ -2210,24 +2224,20 @@ def main():
         </style>
         """, unsafe_allow_html=True)
         
-        # Challenging factors with improved section styling
+        # Challenging factors with improved section styling - Fixed text rendering
         st.markdown("""
         <div class="analysis-section">
             <div class="section-title">📊 Most Challenging Factors for Small Businesses</div>
-            
-            <p>The chart below shows the factors that small businesses identified as most challenging when 
-            pursuing federal contracts. These obstacles represent key areas where policy interventions 
-            could have the greatest impact.</p>
-            
-            <div class="section-subtitle">Key Insights:</div>
-            <div class="insight-highlight">
-                The top challenges relate to navigation complexity and understanding requirements, 
-                suggesting that streamlining processes and improving guidance could have the greatest impact.
-            </div>
-            
-            <p><i>Interact with the chart to explore details. Hover over bars for exact counts and percentages.</i></p>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Break up the content into smaller chunks for better rendering
+        st.markdown("The chart below shows the factors that small businesses identified as most challenging when pursuing federal contracts. These obstacles represent key areas where policy interventions could have the greatest impact.")
+        
+        st.markdown("<div class='section-subtitle'>Key Insights:</div>", unsafe_allow_html=True)
+        st.markdown("<div class='insight-highlight'>The top challenges relate to navigation complexity and understanding requirements, suggesting that streamlining processes and improving guidance could have the greatest impact.</div>", unsafe_allow_html=True)
+        
+        st.markdown("*Interact with the chart to explore details. Hover over bars for exact counts and percentages.*")
         
         # Challenging factors horizontal bar chart with improved formatting
         st.plotly_chart(dashboard.create_challenging_factors_chart(filtered_data), use_container_width=True)
@@ -2235,23 +2245,22 @@ def main():
         # Add vertical spacing between sections
         st.markdown('<div style="margin-top: 30px; margin-bottom: 30px;"></div>', unsafe_allow_html=True)
         
-        # Needed resources section with enhanced styling
+        # Needed resources section with enhanced styling - Fixed text rendering
         st.markdown("""
         <div class="analysis-section">
             <div class="section-title">🛠️ Most Needed Resources</div>
-            
-            <p>This visualization shows the resources that respondents indicated would be most helpful
-            in addressing the challenges they face. The size and color intensity of each segment 
-            corresponds to how frequently each resource was mentioned.</p>
-            
-            <div class="section-subtitle">How to Use This Chart:</div>
-            <ul>
-                <li>Larger segments represent more frequently requested resources</li>
-                <li>Click on segments to see detailed information</li>
-                <li>Hover over areas to see exact counts and percentages</li>
-            </ul>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Break up the content into smaller chunks for better rendering
+        st.markdown("This visualization shows the resources that respondents indicated would be most helpful in addressing the challenges they face. The size and color intensity of each segment corresponds to how frequently each resource was mentioned.")
+        
+        st.markdown("<div class='section-subtitle'>How to Use This Chart:</div>", unsafe_allow_html=True)
+        
+        # Use native Streamlit bullet points
+        st.markdown("- Larger segments represent more frequently requested resources")
+        st.markdown("- Click on segments to see detailed information")
+        st.markdown("- Hover over areas to see exact counts and percentages")
         
         # Needed resources chart
         st.plotly_chart(dashboard.create_needed_resources_chart(filtered_data), use_container_width=True)
@@ -2259,23 +2268,22 @@ def main():
         # Add vertical spacing between sections
         st.markdown('<div style="margin-top: 30px; margin-bottom: 30px;"></div>', unsafe_allow_html=True)
         
-        # Breakdown by respondent type with enhanced styling
+        # Breakdown by respondent type with enhanced styling - Fixed text rendering
         st.markdown("""
         <div class="analysis-section">
             <div class="section-title">👥 Breakdown by Respondent Type</div>
-            
-            <p>This analysis compares perspectives across different types of stakeholders in the 
-            federal contracting ecosystem. Understanding these varying viewpoints is essential for 
-            developing solutions that address the needs of all participants.</p>
-            
-            <div class="section-subtitle">What to Look For:</div>
-            <ul>
-                <li>Differences in complexity perception between small businesses and other stakeholders</li>
-                <li>Distribution of respondent types in the survey sample</li>
-                <li>Variations in reported challenges by respondent category</li>
-            </ul>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Break up the content into smaller chunks for better rendering
+        st.markdown("This analysis compares perspectives across different types of stakeholders in the federal contracting ecosystem. Understanding these varying viewpoints is essential for developing solutions that address the needs of all participants.")
+        
+        st.markdown("<div class='section-subtitle'>What to Look For:</div>", unsafe_allow_html=True)
+        
+        # Use native Streamlit bullet points
+        st.markdown("- Differences in complexity perception between small businesses and other stakeholders")
+        st.markdown("- Distribution of respondent types in the survey sample")
+        st.markdown("- Variations in reported challenges by respondent category")
         
         try:
             # Create a figure with subplots
