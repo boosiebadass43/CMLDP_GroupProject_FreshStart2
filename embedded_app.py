@@ -882,23 +882,23 @@ class SmallBusinessDashboard:
                 height=600,
                 yaxis={
                     'categoryorder': 'total ascending',
-                    'tickfont': {'color': '#E0E0E0'},
-                    'title': {'font': {'color': '#E0E0E0'}},
-                    'gridcolor': '#444444',
-                    'zerolinecolor': '#444444'
+                    'tickfont': {'color': '#333333'},
+                    'title': {'font': {'color': '#333333'}},
+                    'gridcolor': '#F0F0F0',
+                    'zerolinecolor': '#CCCCCC'
                 },
                 xaxis={
-                    'tickfont': {'color': '#E0E0E0'},
-                    'title': {'font': {'color': '#E0E0E0'}},
-                    'gridcolor': '#444444',
-                    'zerolinecolor': '#444444'
+                    'tickfont': {'color': '#333333'},
+                    'title': {'font': {'color': '#333333'}},
+                    'gridcolor': '#F0F0F0',
+                    'zerolinecolor': '#CCCCCC'
                 },
-                paper_bgcolor='#1E1E1E',
-                plot_bgcolor='#1E1E1E',
-                font={'color': '#E0E0E0'},
-                title={'font': {'color': '#E0E0E0'}},
+                paper_bgcolor='#FFFFFF',
+                plot_bgcolor='#F8F9FA',
+                font={'color': '#333333', 'size': 12},
+                title={'font': {'color': '#333333'}},
                 coloraxis_showscale=False,
-                margin={'l': 50, 'r': 50, 't': 70, 'b': 70}
+                margin={'l': 50, 'r': 20, 't': 50, 'b': 100}
             )
             
             return fig
@@ -985,22 +985,22 @@ class SmallBusinessDashboard:
                     'x': 0.5,  # Center the title
                     'xanchor': 'center'
                 },
-                font={'family': 'Arial, sans-serif', 'color': '#E0E0E0'},
+                font={'family': 'Arial, sans-serif', 'color': '#333333'},
                 coloraxis_showscale=True,
                 coloraxis_colorbar={
                     'title': 'Percentage',
                     'ticksuffix': '%',
-                    'tickfont': {'size': 12, 'color': '#E0E0E0'},
-                    'title_font': {'color': '#E0E0E0'}
+                    'tickfont': {'size': 12, 'color': '#333333'},
+                    'title_font': {'color': '#333333'}
                 },
-                plot_bgcolor='#1E1E1E',  # Dark background for dark mode
-                paper_bgcolor='#1E1E1E',  # Dark paper background
-                margin={'l': 50, 'r': 50, 't': 70, 'b': 70},  # Increased bottom margin
+                plot_bgcolor='#F8F9FA',  # Light background
+                paper_bgcolor='#FFFFFF',  # White paper background
+                margin={'l': 50, 'r': 20, 't': 50, 'b': 100},  # Adjusted margins for readability
                 hoverlabel={
-                    'bgcolor': '#333333',
+                    'bgcolor': '#F8F9FA',
                     'font_size': 14,
                     'font_family': 'Arial, sans-serif',
-                    'font_color': '#FFFFFF'
+                    'font_color': '#333333'
                 },
                 # Add subtle border around the figure
                 shapes=[
@@ -1013,7 +1013,7 @@ class SmallBusinessDashboard:
                         x1=1,
                         y1=1,
                         line={
-                            'color': '#444444',
+                            'color': '#E0E0E0',
                             'width': 1,
                         },
                         layer='below'
@@ -1187,31 +1187,31 @@ class SmallBusinessDashboard:
                     height=450,  # Increased height to prevent crowding
                     xaxis={
                         'tickangle': 45, 
-                        'title': {'text': '<b>Hurdle Type</b>', 'font': {'size': 14, 'color': '#E0E0E0'}},
-                        'tickfont': {'size': 11, 'color': '#E0E0E0'},  # Smaller font size for tick labels with light color
+                        'title': {'text': '<b>Hurdle Type</b>', 'font': {'size': 14, 'color': '#333333'}},
+                        'tickfont': {'size': 11, 'color': '#333333'},  # Dark text on light background
                         'automargin': True,  # Auto-adjust margins for labels
-                        'gridcolor': '#444444',  # Dark grid lines
-                        'zerolinecolor': '#444444'  # Dark zero line
+                        'gridcolor': '#F0F0F0',  # Light grid lines
+                        'zerolinecolor': '#CCCCCC'  # Light zero line
                     },
                     yaxis={
-                        'title': {'text': '', 'font': {'size': 14, 'color': '#E0E0E0'}},
+                        'title': {'text': '', 'font': {'size': 14, 'color': '#333333'}},
                         'automargin': True,  # Auto-adjust margins for labels
-                        'tickfont': {'color': '#E0E0E0'},
-                        'gridcolor': '#444444',  # Dark grid lines
-                        'zerolinecolor': '#444444'  # Dark zero line
+                        'tickfont': {'color': '#333333'},
+                        'gridcolor': '#F0F0F0',  # Light grid lines
+                        'zerolinecolor': '#CCCCCC'  # Light zero line
                     },
-                    title_font={'size': 18, 'color': '#E0E0E0'},
-                    font={'family': 'Arial, sans-serif', 'size': 12, 'color': '#E0E0E0'},
-                    margin={'l': 100, 'r': 70, 't': 100, 'b': 150},  # Further increased margins for better readability
-                    paper_bgcolor='#1E1E1E',  # Dark paper background
-                    plot_bgcolor='#1E1E1E',   # Dark plot background
+                    title_font={'size': 18, 'color': '#333333'},
+                    font={'family': 'Arial, sans-serif', 'size': 12, 'color': '#333333'},
+                    margin={'l': 50, 'r': 20, 't': 50, 'b': 100},  # Adjusted margins for readability
+                    paper_bgcolor='#FFFFFF',  # White paper background
+                    plot_bgcolor='#F8F9FA',   # Light plot background
                     coloraxis_colorbar={
                         'title': 'Correlation Strength',
                         'titleside': 'right',
                         'ticks': 'outside',
                         'tickvals': [-1, -0.5, 0, 0.5, 1],
                         'ticktext': ['Strong Negative (-1.0)', 'Moderate Negative', 'No Correlation', 'Moderate Positive', 'Strong Positive (1.0)'],
-                        'tickfont': {'size': 12, 'color': '#E0E0E0'},
+                        'tickfont': {'size': 12, 'color': '#333333'},
                         'len': 0.8,  # Shorter colorbar
                         'y': 0.5,    # Center colorbar
                         'yanchor': 'middle'
@@ -1346,121 +1346,136 @@ class SmallBusinessDashboard:
 
 # Main application UI
 def main():
-    # Add dark mode compatibility CSS
+    # Add light mode styling
     st.markdown("""
     <style>
-    /* Dark mode compatibility - Ensure text and elements have sufficient contrast */
-    .stMarkdown, p, h1, h2, h3, h4, h5, h6, li, .metric-label, .metric-value {
-        color: #E0E0E0 !important;
+    /* Light mode base styling */
+    body {
+        color: #333333;
+        background-color: #FFFFFF;
     }
-    
-    /* Override background colors for dark mode */
-    .card, .analysis-section, .correlation-explanation, .expandable-card, .next-steps-list, .insight-highlight {
-        background-color: #2D2D2D !important;
-        border-color: #444 !important;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.3) !important;
+
+    /* Card styling */
+    .stContainer, div.stBlock {
+        background-color: #F8F9FA;
+        border-radius: 5px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    
-    /* Fix section headers */
-    .main-header, .sub-header, .section-title, .correlation-title, .section-subtitle {
-        color: #E0E0E0 !important;
-        background-color: #333333 !important;
-        border-left-color: #4B5CFF !important;
+
+    /* Header styling */
+    h1, h2, h3, h4, h5 {
+        color: #333333;
+        margin-bottom: 0.5rem;
     }
-    
-    /* Fix stats and highlights */
-    .correlation-stats, .insight-highlight {
-        background-color: #333333 !important;
-        color: #E0E0E0 !important;
-        border-left-color: #4B5CFF !important;
-    }
-    
-    /* Fix step items on recommendation tab */
-    .step-item {
-        display: flex !important;
-        margin-bottom: 15px !important;
-        align-items: flex-start !important;
-        border-bottom-color: #444 !important;
-    }
-    
-    .step-number {
-        background-color: #4B5CFF !important;
-        color: white !important;
-        border-radius: 50% !important;
-        width: 30px !important;
-        height: 30px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin-right: 15px !important;
-        flex-shrink: 0 !important;
-    }
-    
-    .step-content {
-        flex-grow: 1 !important;
-    }
-    
-    .step-title {
-        font-weight: bold !important;
-        margin-bottom: 5px !important;
-        color: #E0E0E0 !important;
-    }
-    
-    .step-description {
-        color: #CCCCCC !important;
-    }
-    
-    /* Fix spacing between elements */
+
+    /* Ensure proper spacing */
     .element-container {
         margin-bottom: 1.5rem !important;
     }
-    
-    /* Add container overflow fixes */
+
+    /* Custom component styling */
+    .correlation-stats {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333333;
+    }
+
+    .section-subtitle {
+        font-weight: bold;
+        color: #4B5CFF;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+
+    .insight-highlight {
+        padding: 10px;
+        background-color: #F0F4FF;
+        border-left: 3px solid #4B5CFF;
+        margin-bottom: 15px;
+    }
+
+    /* Step styling for recommendations */
+    .step-item {
+        display: flex;
+        margin-bottom: 20px;
+        align-items: flex-start;
+    }
+
+    .step-number {
+        background-color: #4B5CFF;
+        color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .step-content {
+        flex-grow: 1;
+    }
+
+    .step-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333333;
+    }
+
+    .step-description {
+        color: #555555;
+    }
+
+    /* Container overflow fixes */
     .stContainer, .element-container, .stMarkdown, .st-ae, .st-af {
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
     }
-    
-    /* Fix Executive Summary overflow */
+
+    /* Executive Summary overflow */
     .st-ae {
         overflow-y: auto !important;
         max-height: 600px !important;
     }
-    
-    /* Add scrollable overflow for long sections */
+
+    /* Scrollable overflow for long sections */
     .stExpander {
         overflow-y: auto !important;
         max-height: 80vh !important;
     }
-    
-    /* Fix sentiment indicators */
+
+    /* Sentiment indicators */
     .sentiment {
-        border: 1px solid #444 !important;
+        border: 1px solid #E0E0E0;
     }
-    
+
     .sentiment.positive {
-        background-color: rgba(0, 128, 0, 0.2) !important;
-        color: #A0FFA0 !important;
+        background-color: rgba(0, 128, 0, 0.1);
+        color: #006600;
     }
-    
+
     .sentiment.neutral {
-        background-color: rgba(128, 128, 128, 0.2) !important;
-        color: #E0E0E0 !important;
+        background-color: rgba(128, 128, 128, 0.1);
+        color: #555555;
     }
-    
+
     .sentiment.negative {
-        background-color: rgba(255, 0, 0, 0.2) !important;
-        color: #FFA0A0 !important;
+        background-color: rgba(255, 0, 0, 0.1);
+        color: #CC0000;
     }
-    
-    /* Fix quote card styling */
+
+    /* Quote card styling */
     .quote-card {
-        background-color: #333 !important;
-        border-color: #444 !important;
+        background-color: #F8F9FA;
+        border-color: #E0E0E0;
     }
-    
+
     .quote-text {
-        color: #E0E0E0 !important;
+        color: #333333;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -1584,21 +1599,21 @@ def main():
     .chart-container {
         margin-bottom: 2.5rem;
         padding: 1rem;
-        background-color: #2D2D2D !important;
+        background-color: #FFFFFF !important;
         border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
-        border: 1px solid #444 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid #E0E0E0 !important;
     }
     
-    /* Fix SVG text to be visible on dark backgrounds */
+    /* SVG text styling for light backgrounds */
     svg text, .js-plotly-plot text {
-        fill: #E0E0E0 !important;
+        fill: #333333 !important;
     }
     
-    /* Fix axis lines and grids for dark mode */
+    /* Axis lines and grids for light mode */
     .js-plotly-plot .xgrid, .js-plotly-plot .ygrid,
     .js-plotly-plot .xtick, .js-plotly-plot .ytick {
-        stroke: #444 !important;
+        stroke: #E0E0E0 !important;
     }
     
     /* Fix plotly charts minimum heights to prevent squishing */
