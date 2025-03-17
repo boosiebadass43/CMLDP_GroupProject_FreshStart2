@@ -2070,7 +2070,7 @@ def main():
                     # Get the cleaned top resource text (remove quotes if present)
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     
-                    # Create a card similar to the other metrics, but with an expander for details
+                    # Create a card showing only the most requested resource
                     st.markdown(f"""
                     <div class="card" style="text-align: center;">
                         <div class="metric-label">Most Requested Resource</div>
@@ -2078,15 +2078,6 @@ def main():
                         <div>{percentage}% of resource mentions</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    
-                    # Add an expander below the card for additional details
-                    with st.expander("View all top requested resources", expanded=False):
-                        # Add bullet points for top resources
-                        for i, (resource, count) in enumerate(top_resources):
-                            resource_pct = round((count / total_mentions) * 100)
-                            if i == 0:  # Skip first item as it's already shown in the card
-                                continue
-                            st.markdown(f"* **{resource}** ({resource_pct}%)")
                 else:
                     # Fallback for when no data is available
                     st.metric("Most Requested Resource", "N/A", "Data not available")
