@@ -2522,25 +2522,25 @@ def main():
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     # Shorten long resource names for display consistency
                     if "Centralized getting started portal with step-by-step guidance" in cleaned_resource:
-                        cleaned_resource = "Centralized getting started portal"
+                        cleaned_resource = "Getting started portal"
                     
-                    # Direct card using HTML
+                    # Direct card using HTML with flex layout to ensure proper alignment
                     st.markdown(f"""
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{cleaned_resource}</div>
-                        <div style="color: #666; font-size: 0.9rem;">{percentage}% of resource mentions</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">{cleaned_resource}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto;">{percentage}% of resource mentions</div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     # Fallback for when no data is available
                     st.markdown(f"""
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem;">No resource data available</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto;">No resource data available</div>
                     </div>
                     """, unsafe_allow_html=True)
             except Exception as e:
@@ -2549,10 +2549,10 @@ def main():
                 # Direct card using HTML for error case
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem;">Error processing data</div>
+                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Error processing data</div>
                 </div>
                 """, unsafe_allow_html=True)
         
