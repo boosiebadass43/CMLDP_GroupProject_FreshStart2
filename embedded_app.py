@@ -2110,46 +2110,7 @@ def main():
             st.plotly_chart(dashboard.create_timeline_distribution_chart(filtered_data), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Add significant vertical spacing
-        st.markdown('<div class="section-spacer" style="margin-top: 40px; margin-bottom: 40px;"></div>', unsafe_allow_html=True)
-        
-        # Improved correlation heatmap section with better explanation and stats
-        st.markdown('<div class="sub-header">🔗 Correlation Between Hurdles and Perceived Complexity</div>', unsafe_allow_html=True)
-        
-        # Generate a simulated correlation p-value for demonstration
-        import random
-        overall_corr = 0.67
-        p_value = 0.003
-        
-        st.markdown(f"""
-        <div class="correlation-explanation">
-            <div class="correlation-title">How to Interpret This Analysis</div>
-            
-            <div class="correlation-stats">
-                Overall Correlation: r = {overall_corr:.2f} (p < {p_value:.3f})
-            </div>
-            
-            <p>This heatmap shows which hurdles have the strongest relationship with how complex 
-            respondents perceive the federal contracting process to be. Understanding these 
-            relationships helps identify the most impactful areas for intervention.</p>
-            
-            <ul style="margin-bottom: 10px;">
-                <li><strong>Positive correlation (blue):</strong> When this hurdle is present, respondents tend to rate the overall process as more complex. The stronger the blue, the stronger the relationship.</li>
-                <li><strong>Negative correlation (red):</strong> When this hurdle is present, respondents surprisingly tend to rate the overall process as less complex. This could indicate areas where expectations are managed better.</li>
-                <li><strong>No correlation (white):</strong> This hurdle has little relationship with perceived complexity, suggesting it may be less significant in overall experience.</li>
-            </ul>
-            
-            <p><strong>Key Finding:</strong> Strong positive correlations suggest areas where addressing specific hurdles could have the greatest impact on reducing perceived complexity and improving the overall onboarding experience.</p>
-            
-            <p style="font-style: italic; margin-top: 15px; font-size: 0.9rem;">Hover over each cell in the visualization below to see exact correlation values and additional details.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Display the enhanced correlation heatmap
-        st.plotly_chart(dashboard.create_correlation_heatmap(filtered_data), use_container_width=True)
-        
-        # Add significant vertical spacing after the chart
-        st.markdown('<div class="section-spacer" style="margin-top: 40px; margin-bottom: 40px;"></div>', unsafe_allow_html=True)
+        # End of Key Challenges section - no correlation heatmap
     
     # Tab 2: Detailed Analysis
     with tab2:
