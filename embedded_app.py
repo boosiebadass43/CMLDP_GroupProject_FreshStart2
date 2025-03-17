@@ -2070,15 +2070,22 @@ def main():
                     # Get the cleaned top resource text (remove quotes if present)
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     
-                    # Use Streamlit's native expander instead of custom collapsible card
-                    with st.expander("Most Requested Resource", expanded=True):
-                        st.markdown(f"### {cleaned_resource}")
-                        st.markdown(f"{percentage}% of resource mentions")
-                        
+                    # Create a card similar to the other metrics, but with an expander for details
+                    st.markdown(f"""
+                    <div class="card" style="text-align: center;">
+                        <div class="metric-label">Most Requested Resource</div>
+                        <div class="metric-value" style="font-size: 1.5rem;">{cleaned_resource}</div>
+                        <div>{percentage}% of resource mentions</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Add an expander below the card for additional details
+                    with st.expander("View all top requested resources", expanded=False):
                         # Add bullet points for top resources
-                        st.markdown("#### Top requested resources:")
-                        for resource, count in top_resources:
+                        for i, (resource, count) in enumerate(top_resources):
                             resource_pct = round((count / total_mentions) * 100)
+                            if i == 0:  # Skip first item as it's already shown in the card
+                                continue
                             st.markdown(f"* **{resource}** ({resource_pct}%)")
                 else:
                     # Fallback for when no data is available
