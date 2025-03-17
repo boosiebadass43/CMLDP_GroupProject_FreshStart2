@@ -24,7 +24,7 @@ CHART_COLORS = {
     'sequential': ['#caf0f8', '#90e0ef', '#48cae4', '#00b4d8', '#0096c7', '#0077b6', '#023e8a']
 }
 
-# Set page configuration first, before any other st commands
+# Set page configuration with proper spacing
 st.set_page_config(
     page_title="Small Business Federal Contracting Dashboard",
     page_icon="📊",
@@ -32,9 +32,213 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Add enhanced visual aesthetics with colors and animations
+# HELPER FUNCTIONS FOR CONSISTENT SPACING AND LAYOUT
+
+def section_header(title, description=None):
+    """Creates a section header with consistent spacing"""
+    st.markdown(f"<h2>{title}</h2>", unsafe_allow_html=True)
+    if description:
+        st.markdown(f"<p class='section-description'>{description}</p>", unsafe_allow_html=True)
+    
+def add_vertical_space(height=1):
+    """Add vertical space with a multiplier of 0.5rem"""
+    st.markdown(f"<div style='height:{height*0.5}rem'></div>", unsafe_allow_html=True)
+
+def card_container(content_function):
+    """Creates a card container with proper spacing"""
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    content_function()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Add comprehensive CSS for spacing, visual hierarchy, and layout balance
 st.markdown("""
 <style>
+/* ========== CORE SPACING SYSTEM ========== */
+/* Creates a consistent 8-point grid system for all spacing */
+
+/* Base container spacing */
+.main .block-container {
+    padding-top: 2rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 1200px !important;  /* Prevent excess width on large screens */
+}
+
+/* Consistent section spacing */
+.element-container {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Proper paragraph spacing */
+p {
+    margin-bottom: 1rem !important;
+    line-height: 1.6 !important;
+}
+
+/* Header spacing with proper hierarchy */
+h1 {
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+h2 {
+    margin-top: 2rem !important;
+    margin-bottom: 1rem !important;
+}
+
+h3 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* Fix tab container spacing */
+.stTabs [data-baseweb="tab-panel"] {
+    padding-top: 1.5rem !important;
+}
+
+/* Add space below tabs */
+.stTabs {
+    margin-bottom: 1rem !important;
+}
+
+/* ========== CARD & CONTAINER LAYOUTS ========== */
+
+/* Card styling with proper internal spacing */
+.card, div.stBlock {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Chart container spacing */
+div[data-testid="stMetric"] {
+    background-color: white;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+    border-radius: 6px;
+}
+
+/* Fix metric spacing & hierarchy */
+div[data-testid="stMetric"] > div:first-child {
+    margin-bottom: 0.5rem !important;
+}
+
+div[data-testid="stMetricLabel"] {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+div[data-testid="stMetricValue"] {
+    font-size: 1.75rem !important;
+    font-weight: 600 !important;
+}
+
+/* ========== LIST & CONTENT FORMATTING ========== */
+
+/* List spacing */
+ul, ol {
+    margin-bottom: 1rem !important;
+    padding-left: 1.5rem !important;
+}
+
+li {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Expander spacing */
+.streamlit-expanderHeader {
+    padding: 0.75rem 1rem !important;
+    font-weight: 600 !important;
+}
+
+.streamlit-expanderContent {
+    padding: 1.25rem !important;
+}
+
+/* ========== TABLE & DATA VISUALIZATION SPACING ========== */
+
+/* Clean table spacing */
+.stTable {
+    margin-top: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Chart spacing */
+.js-plotly-plot {
+    margin-bottom: 1.5rem !important;
+}
+
+/* ========== SIDEBAR OPTIMIZATION ========== */
+
+/* Fix sidebar spacing */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    padding-top: 2rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+[data-testid="stSidebar"] h2 {
+    margin-top: 0 !important;
+}
+
+[data-testid="stSidebar"] hr {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* ========== OPEN-ENDED RESPONSES GRID ========== */
+
+/* Response grid with responsive layout */
+.response-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    gap: 1rem !important;
+    margin-top: 1.5rem !important;
+}
+
+.response-card {
+    padding: 1.25rem !important;
+    margin-bottom: 0 !important;
+    height: calc(100% - 2.5rem) !important; /* Fixed height cards in grid */
+}
+
+/* ========== FINAL TOUCH-UPS ========== */
+
+/* Fix button spacing */
+button {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Fix multiselect spacing */
+.stMultiSelect {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Column spacing in layout */
+div.row-widget.stHorizontal {
+    gap: 1.5rem !important;
+}
+
+/* Horizontal rule spacing */
+hr {
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Divider styling */
+.divider {
+    height: 2.5rem !important;
+}
+
+/* Add subtle section separators where needed */
+.section-separator {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 2.5rem !important;
+    padding-top: 2.5rem !important;
+}
+
 /* Color palette and visual enhancements */
 :root {
     --primary: #4361EE;
@@ -2229,7 +2433,8 @@ def main():
     
     # Tab 1: Key Challenges
     with tab1:
-        html_content('<div class="sub-header">🚩 Key Challenges Facing Small Businesses</div>')
+        section_header("🚩 Key Challenges Facing Small Businesses", 
+                       "This section highlights the most significant obstacles small businesses face when pursuing federal contracts.")
         
         # Row for key metrics
         col1, col2, col3 = st.columns(3)
@@ -2237,41 +2442,55 @@ def main():
         with col1:
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
-                st.markdown(f"""
-                <div class="card" style="text-align: center;">
-                    <div class="metric-label">Average Complexity Rating</div>
-                    <div class="metric-value">{avg_complexity}/5</div>
-                    <div>Rated by {len(filtered_data)} respondents</div>
-                </div>
-                """, unsafe_allow_html=True)
+                
+                def metric_content():
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div class="metric-label">Average Complexity Rating</div>
+                        <div class="metric-value">{avg_complexity}/5</div>
+                        <div>Rated by {len(filtered_data)} respondents</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                card_container(metric_content)
             except:
-                st.markdown(f"""
-                <div class="card" style="text-align: center;">
-                    <div class="metric-label">Average Complexity Rating</div>
-                    <div class="metric-value">N/A</div>
-                    <div>Data not available</div>
-                </div>
-                """, unsafe_allow_html=True)
+                def metric_content():
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div class="metric-label">Average Complexity Rating</div>
+                        <div class="metric-value">N/A</div>
+                        <div>Data not available</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                card_container(metric_content)
             
         with col2:
             try:
                 most_common_timeline = filtered_data['timeline_first_contract'].value_counts().index[0]
                 timeline_pct = round(filtered_data['timeline_first_contract'].value_counts().iloc[0] / len(filtered_data) * 100)
-                st.markdown(f"""
-                <div class="card" style="text-align: center;">
-                    <div class="metric-label">Most Common Timeline</div>
-                    <div class="metric-value">{most_common_timeline}</div>
-                    <div>{timeline_pct}% of respondents</div>
-                </div>
-                """, unsafe_allow_html=True)
+                
+                def metric_content():
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div class="metric-label">Most Common Timeline</div>
+                        <div class="metric-value">{most_common_timeline}</div>
+                        <div>{timeline_pct}% of respondents</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                card_container(metric_content)
             except:
-                st.markdown(f"""
-                <div class="card" style="text-align: center;">
-                    <div class="metric-label">Most Common Timeline</div>
-                    <div class="metric-value">N/A</div>
-                    <div>Data not available</div>
-                </div>
-                """, unsafe_allow_html=True)
+                def metric_content():
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div class="metric-label">Most Common Timeline</div>
+                        <div class="metric-value">N/A</div>
+                        <div>Data not available</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                card_container(metric_content)
             
         with col3:
             try:
@@ -2299,13 +2518,16 @@ def main():
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     
                     # Create a card showing only the most requested resource
-                    st.markdown(f"""
-                    <div class="card" style="text-align: center;">
-                        <div class="metric-label">Most Requested Resource</div>
-                        <div class="metric-value" style="font-size: 1.5rem;">{cleaned_resource}</div>
-                        <div>{percentage}% of resource mentions</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    def metric_content():
+                        st.markdown(f"""
+                        <div style="text-align: center;">
+                            <div class="metric-label">Most Requested Resource</div>
+                            <div class="metric-value" style="font-size: 1.5rem;">{cleaned_resource}</div>
+                            <div>{percentage}% of resource mentions</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    card_container(metric_content)
                 else:
                     # Fallback for when no data is available
                     st.metric("Most Requested Resource", "N/A", "Data not available")
@@ -2313,8 +2535,14 @@ def main():
                 logger.error(f"Error displaying most requested resource: {str(e)}")
                 st.metric("Most Requested Resource", "N/A", "Error processing data")
         
+        # Add vertical space before visualizations
+        add_vertical_space(3)
+        
+        # Subheader for visualizations
+        section_header("Visualization of Key Challenges", 
+                      "The charts below illustrate the most significant barriers and hurdles reported by survey respondents.")
+        
         # Visualizations for tab 1 with container for consistent spacing
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         
         with col1:
@@ -2322,7 +2550,9 @@ def main():
             
         with col2:
             st.plotly_chart(dashboard.create_barriers_chart(filtered_data), use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            
+        # Add vertical space after visualizations
+        add_vertical_space(2)
         
         # Add significant vertical spacing
         st.markdown('<div class="section-spacer"></div>', unsafe_allow_html=True)
@@ -2342,7 +2572,8 @@ def main():
     
     # Tab 2: Detailed Analysis
     with tab2:
-        st.markdown('<div class="sub-header">🔍 Detailed Analysis of Survey Responses</div>', unsafe_allow_html=True)
+        section_header("🔍 Detailed Analysis of Survey Responses", 
+                      "This section provides a deeper dive into the survey data, with visualizations highlighting specific pain points and needs.")
         
         # Add custom CSS for better section styling
         st.markdown("""
@@ -2522,7 +2753,8 @@ def main():
     
     # Tab 3: Open-Ended Responses
     with tab3:
-        html_content('<div class="sub-header">💬 Analysis of Open-Ended Responses</div>')
+        section_header("💬 Analysis of Open-Ended Responses", 
+                      "This section categorizes and presents qualitative feedback from the survey responses, organized by theme and sentiment.")
         
         # Function to display all responses for a selected theme
         def display_theme_responses(df_responses, selected_theme, selected_sentiment="All"):
@@ -3199,7 +3431,8 @@ def main():
     
     # Tab 4: Recommendations
     with tab4:
-        html_content('<div class="sub-header">🚀 Recommendations Based on Survey Findings</div>')
+        section_header("🚀 Recommendations Based on Survey Findings", 
+                      "This section presents actionable recommendations derived from the survey data, with implementation steps and expected impacts.")
         
         # Add custom CSS for recommendation cards
         st.markdown("""
@@ -3287,8 +3520,12 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
+        # Add vertical spacing before outcomes section
+        add_vertical_space(3)
+        
         # Expected outcomes with expanded explanations
-        st.markdown('<div class="sub-header">📊 Expected Outcomes</div>', unsafe_allow_html=True)
+        section_header("📊 Expected Outcomes", 
+                      "The following outcomes are projected based on the survey data analysis and industry benchmarks.")
         
         st.markdown("""
         Our recommendations are expected to yield significant improvements in federal contracting 
