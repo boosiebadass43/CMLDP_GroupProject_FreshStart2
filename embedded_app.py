@@ -2070,46 +2070,22 @@ def main():
                     # Get the cleaned top resource text (remove quotes if present)
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     
-                    # Create an expandable card with tooltip that matches the fixed card height
-                    st.markdown(f"""
-                    <div class="expandable-card" onclick="this.classList.toggle('expanded'); this.querySelector('.full-resource').style.display = this.querySelector('.full-resource').style.display === 'none' ? 'block' : 'none';">
-                        <div class="tooltip" title="Click to expand">ⓘ</div>
-                        <div class="metric-label">Most Requested Resource</div>
-                        <div class="metric-value" style="font-size: 1.5rem;">{cleaned_resource}</div>
-                        <div>{percentage}% of resource mentions</div>
-                        <div class="full-resource" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; text-align: left;">
-                            <p><strong>Top requested resources:</strong></p>
-                            <ol>
-                            """, unsafe_allow_html=True)
-                    
-                    # Add each top resource as a list item
-                    for resource, count in top_resources:
-                        resource_pct = round((count / total_mentions) * 100)
-                        st.markdown(f"<li><strong>{resource}</strong> ({resource_pct}%)</li>", unsafe_allow_html=True)
-                    
-                    st.markdown("""
-                            </ol>
-                            <p style="font-style: italic; font-size: 0.9rem;">Click anywhere on this card to collapse</p>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Use Streamlit's native expander instead of custom collapsible card
+                    with st.expander("Most Requested Resource", expanded=True):
+                        st.markdown(f"### {cleaned_resource}")
+                        st.markdown(f"{percentage}% of resource mentions")
+                        
+                        # Add bullet points for top resources
+                        st.markdown("#### Top requested resources:")
+                        for resource, count in top_resources:
+                            resource_pct = round((count / total_mentions) * 100)
+                            st.markdown(f"* **{resource}** ({resource_pct}%)")
                 else:
-                    st.markdown(f"""
-                    <div class="card" style="text-align: center;">
-                        <div class="metric-label">Most Requested Resource</div>
-                        <div class="metric-value" style="font-size: 1.5rem;">N/A</div>
-                        <div>Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Fallback for when no data is available
+                    st.metric("Most Requested Resource", "N/A", "Data not available")
             except Exception as e:
                 logger.error(f"Error displaying most requested resource: {str(e)}")
-                st.markdown(f"""
-                <div class="card" style="text-align: center;">
-                    <div class="metric-label">Most Requested Resource</div>
-                    <div class="metric-value" style="font-size: 1.5rem;">N/A</div>
-                    <div>Data not available</div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.metric("Most Requested Resource", "N/A", "Error processing data")
         
         # Visualizations for tab 1 with container for consistent spacing
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
