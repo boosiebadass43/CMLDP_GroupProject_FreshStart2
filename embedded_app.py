@@ -900,11 +900,24 @@ class SmallBusinessDashboard:
         
         fig.update_layout(
             height=500,
-            yaxis={'categoryorder': 'total ascending'},
+            yaxis={
+                'categoryorder': 'total ascending',
+                'tickfont': {'size': 14, 'color': '#000000'},
+                'title_font': {'size': 15, 'color': '#000000'}
+            },
+            xaxis={
+                'tickfont': {'size': 14, 'color': '#000000'},
+                'title_font': {'size': 15, 'color': '#000000'}
+            },
+            title={
+                'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
+                'x': 0.5,
+                'xanchor': 'center'
+            },
             coloraxis_showscale=False,
             paper_bgcolor='#FFFFFF',
             plot_bgcolor='#F8F9FA',
-            font=dict(color='#333333'),
+            font=dict(color='#000000', family='Arial, sans-serif', size=14),
             margin=dict(l=50, r=20, t=50, b=100),
             transition_duration=500
         )
@@ -947,12 +960,26 @@ class SmallBusinessDashboard:
             
             fig.update_layout(
                 height=500,
-                yaxis={'categoryorder': 'total ascending'},
+                yaxis={
+                    'categoryorder': 'total ascending',
+                    'tickfont': {'size': 14, 'color': '#000000'},
+                    'title_font': {'size': 15, 'color': '#000000'}
+                },
+                xaxis={
+                    'tickfont': {'size': 14, 'color': '#000000'},
+                    'title_font': {'size': 15, 'color': '#000000'}
+                },
+                title={
+                    'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
+                    'x': 0.5,
+                    'xanchor': 'center'
+                },
                 coloraxis_showscale=False,
                 paper_bgcolor='#FFFFFF',
                 plot_bgcolor='#F8F9FA',
-                font=dict(color='#333333'),
-                margin=dict(l=50, r=20, t=50, b=100)
+                font=dict(color='#000000', family='Arial, sans-serif', size=14),
+                margin=dict(l=50, r=20, t=50, b=100),
+                transition_duration=500
             )
             
             return fig
@@ -990,8 +1017,25 @@ class SmallBusinessDashboard:
                     height=400,
                     xaxis_title="Respondent Type",
                     yaxis_title="Average Complexity (1-5)",
+                    xaxis={
+                        'tickfont': {'size': 14, 'color': '#000000'},
+                        'title_font': {'size': 15, 'color': '#000000'}
+                    },
+                    yaxis={
+                        'tickfont': {'size': 14, 'color': '#000000'},
+                        'title_font': {'size': 15, 'color': '#000000'},
+                        'range': [0, 5.5]
+                    },
+                    title={
+                        'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
+                        'x': 0.5,
+                        'xanchor': 'center'
+                    },
                     coloraxis_showscale=False,
-                    yaxis_range=[0, 5.5]
+                    paper_bgcolor='#FFFFFF',
+                    plot_bgcolor='#F8F9FA',
+                    font=dict(color='#000000', family='Arial, sans-serif', size=14),
+                    transition_duration=500
                 )
                 
                 return fig
@@ -1055,11 +1099,25 @@ class SmallBusinessDashboard:
                 
                 fig.update_layout(
                     height=400,
+                    xaxis={
+                        'tickfont': {'size': 14, 'color': '#000000'},
+                        'title_font': {'size': 15, 'color': '#000000'}
+                    },
+                    yaxis={
+                        'tickfont': {'size': 14, 'color': '#000000'},
+                        'title_font': {'size': 15, 'color': '#000000'}
+                    },
+                    title={
+                        'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
+                        'x': 0.5,
+                        'xanchor': 'center'
+                    },
                     coloraxis_showscale=False,
                     paper_bgcolor='#FFFFFF',
                     plot_bgcolor='#F8F9FA',
-                    font=dict(color='#333333'),
-                    margin=dict(l=50, r=20, t=50, b=100)
+                    font=dict(color='#000000', family='Arial, sans-serif', size=14),
+                    margin=dict(l=50, r=20, t=50, b=100),
+                    transition_duration=500
                 )
                 
                 return fig
@@ -1123,23 +1181,28 @@ class SmallBusinessDashboard:
                 height=600,
                 yaxis={
                     'categoryorder': 'total ascending',
-                    'tickfont': {'color': '#333333'},
-                    'title': {'font': {'color': '#333333'}},
+                    'tickfont': {'size': 14, 'color': '#000000'},
+                    'title': {'font': {'size': 15, 'color': '#000000'}},
                     'gridcolor': '#F0F0F0',
                     'zerolinecolor': '#CCCCCC'
                 },
                 xaxis={
-                    'tickfont': {'color': '#333333'},
-                    'title': {'font': {'color': '#333333'}},
+                    'tickfont': {'size': 14, 'color': '#000000'},
+                    'title': {'font': {'size': 15, 'color': '#000000'}},
                     'gridcolor': '#F0F0F0',
                     'zerolinecolor': '#CCCCCC'
                 },
                 paper_bgcolor='#FFFFFF',
                 plot_bgcolor='#F8F9FA',
-                font={'color': '#333333', 'size': 12},
-                title={'font': {'color': '#333333'}},
+                font={'color': '#000000', 'size': 14, 'family': 'Arial, sans-serif'},
+                title={
+                    'font': {'size': 18, 'color': '#000000', 'family': 'Arial, sans-serif'},
+                    'x': 0.5,
+                    'xanchor': 'center'
+                },
                 coloraxis_showscale=False,
-                margin={'l': 50, 'r': 20, 't': 50, 'b': 100}
+                margin={'l': 50, 'r': 20, 't': 50, 'b': 100},
+                transition_duration=500
             )
             
             return fig
@@ -1217,27 +1280,27 @@ class SmallBusinessDashboard:
                 yaxis={
                     'categoryorder': 'total ascending',
                     'title': '',
-                    'tickfont': {'size': 13, 'family': 'Arial, sans-serif'},
+                    'tickfont': {'size': 14, 'family': 'Arial, sans-serif', 'color': '#000000'},
                     'gridcolor': '#f5f5f5'
                 },
                 xaxis={
-                    'title': {'text': '<b>Number of Responses</b>', 'font': {'size': 14}},
-                    'tickfont': {'size': 12},
+                    'title': {'text': '<b>Number of Responses</b>', 'font': {'size': 15, 'color': '#000000'}},
+                    'tickfont': {'size': 14, 'color': '#000000'},
                     'gridcolor': '#f5f5f5',
                     'showgrid': True
                 },
                 title={
-                    'font': {'size': 18, 'family': 'Arial, sans-serif'},
+                    'font': {'size': 18, 'family': 'Arial, sans-serif', 'color': '#000000'},
                     'x': 0.5,  # Center the title
                     'xanchor': 'center'
                 },
-                font={'family': 'Arial, sans-serif', 'color': '#333333'},
+                font={'family': 'Arial, sans-serif', 'color': '#000000', 'size': 14},
                 coloraxis_showscale=True,
                 coloraxis_colorbar={
                     'title': 'Percentage',
                     'ticksuffix': '%',
-                    'tickfont': {'size': 12, 'color': '#333333'},
-                    'title_font': {'color': '#333333'}
+                    'tickfont': {'size': 14, 'color': '#000000'},
+                    'title_font': {'size': 14, 'color': '#000000'}
                 },
                 plot_bgcolor='#F8F9FA',  # Light background
                 paper_bgcolor='#FFFFFF',  # White paper background
@@ -2548,11 +2611,11 @@ def main():
             # Count responses after filtering
             response_count = len(filtered_examples)
             
-            # Display theme header with count (maintaining your existing style)
+            # Display theme header with count (maintaining your existing style but with better contrast)
             st.markdown(f"""
-                <div style="background-color:#1E3A8A; color:white; padding:10px 15px; border-radius:5px; margin-bottom:15px;">
-                    <h3 style="margin:0;">{selected_theme}</h3>
-                    <p style="margin:5px 0 0 0; font-size:0.9rem;">{response_count} responses</p>
+                <div style="background-color:#1E3A8A; color:white; padding:15px 20px; border-radius:5px; margin-bottom:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h3 style="margin:0; font-size:1.4rem; font-weight:bold;">{selected_theme}</h3>
+                    <p style="margin:7px 0 0 0; font-size:1.0rem;"><strong>{response_count} responses</strong></p>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -2960,9 +3023,9 @@ def main():
         if view_mode == "All Responses" and selected_theme != "All Themes":
             # Add a header to explain what the user is viewing
             st.markdown("""
-            <div style="margin-bottom: 20px; background-color: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #1E3A8A;">
-                <h4 style="margin-top: 0; color: #1E3A8A;">All Responses View</h4>
-                <p style="margin-bottom: 0;">Viewing all individual responses for the selected theme. Use the sentiment filter to narrow results.</p>
+            <div style="margin-bottom: 20px; background-color: #E1EFFE; padding: 15px; border-radius: 8px; border-left: 5px solid #1E3A8A;">
+                <h4 style="margin-top: 0; color: #000000; font-weight: bold;">All Responses View</h4>
+                <p style="margin-bottom: 0; color: #000000;">Viewing all individual responses for the selected theme. Use the sentiment filter to narrow results.</p>
             </div>
             """, unsafe_allow_html=True)
             
