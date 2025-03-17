@@ -461,6 +461,183 @@ code {
 svg text {
     fill: #333333 !important;
 }
+
+/* ========== MOBILE OPTIMIZATION ========== */
+@media screen and (max-width: 768px) {
+    /* Fix overlapping toolbars with chart titles */
+    .js-plotly-plot .plotly {
+        margin-top: 45px !important; /* Create space for toolbar */
+    }
+    
+    /* Fix chart title positioning */
+    .js-plotly-plot .gtitle {
+        margin-top: 30px !important;
+    }
+    
+    /* Ensure chart containers have enough height */
+    [data-testid="stBlock"] > div:has(.js-plotly-plot) {
+        min-height: 400px !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    /* Fix tab design for mobile */
+    .stTabs [data-baseweb="tab-list"] {
+        flex-wrap: wrap !important;
+        gap: 2px !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        padding: 8px 16px !important;
+        font-size: 0.8rem !important;
+        white-space: nowrap !important;
+        min-width: auto !important;
+        margin-bottom: 2px !important;
+    }
+    
+    /* Executive summary positioning fix */
+    [data-testid="stExpander"] {
+        margin-bottom: 25px !important; 
+        z-index: 1 !important; /* Lower z-index so it doesn't overlap tabs */
+    }
+    
+    /* Ensure tabs are above other content */
+    .stTabs {
+        z-index: 2 !important;
+        position: relative !important;
+    }
+    
+    /* More spacing after exec summary */
+    .streamlit-expanderContent {
+        margin-bottom: 20px !important;
+    }
+    
+    /* Fix metric cards on mobile */
+    [data-testid="stMetric"] {
+        padding: 10px !important;
+    }
+    
+    div[data-testid="stMetricValue"] {
+        font-size: 1.4rem !important;
+    }
+    
+    div[data-testid="stMetricLabel"] {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Stack columns on mobile */
+    .row-widget.stHorizontal {
+        flex-wrap: wrap !important;
+    }
+    
+    .row-widget.stHorizontal > div {
+        min-width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Mobile typography adjustments */
+    h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    h3 {
+        font-size: 1.1rem !important;
+    }
+    
+    p, li {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Overall container padding adjustment */
+    .main .block-container {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-top: 1rem !important;
+    }
+    
+    /* Optimize sidebar for mobile */
+    [data-testid="stSidebar"] {
+        width: 100% !important;
+    }
+    
+    /* Response grid for mobile screens */
+    .response-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Better touch targets for mobile */
+    button, select, input {
+        min-height: 44px !important; /* Apple's recommended minimum */
+    }
+    
+    /* Fix for plotly modebar (toolbar) */
+    .modebar {
+        top: 0 !important;
+        right: 0 !important;
+        background: rgba(255,255,255,0.7) !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Fix overlapping in bar charts */
+    .js-plotly-plot .plotly .main-svg {
+        overflow: visible !important;
+    }
+
+    /* Testing fix for tab panel overlap */
+    .stTabs [data-baseweb="tab-panel"] {
+        padding-top: 2rem !important;
+    }
+    
+    /* Fix executive summary expandable section */
+    .streamlit-expanderHeader {
+        display: block !important;
+        padding-right: 40px !important; /* Space for the toggle icon */
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* Adjust spacing for content after tabs */
+    .stTabs + div {
+        margin-top: 1rem !important;
+    }
+}
+
+/* ========== SPECIFIC FIXES FOR IPHONE ========== */
+@media screen and (max-width: 390px) {
+    /* Even more compact sizing for very small screens */
+    .main .block-container {
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
+    }
+    
+    /* Smaller tabs for iPhone */
+    .stTabs [data-baseweb="tab"] {
+        padding: 6px 8px !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* Ensure chart visibility */
+    .js-plotly-plot .plotly {
+        margin-top: 60px !important; /* More space for toolbar */
+    }
+}
+
+/* ========== ADDITIONAL LAYOUTS FOR TABLETS ========== */
+@media screen and (min-width: 769px) and (max-width: 992px) {
+    /* Tablet-specific adjustments */
+    .main .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .js-plotly-plot .plotly {
+        margin-top: 30px !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -496,6 +673,46 @@ ENGLISH_STOPWORDS = {
     "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', 
     "weren't", 'won', "won't", 'wouldn', "wouldn't", 'would', 'get', 'make', 'like', 'time', 'also', 'use'
 }
+
+# Mobile-optimized chart configuration
+def configure_chart_for_mobile(fig):
+    """Apply mobile-friendly settings to Plotly charts"""
+    fig.update_layout(
+        # More margin at top for toolbar
+        margin=dict(t=80, r=20, b=60, l=40),
+        
+        # Ensure hoverlabels don't get cut off
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12,
+            font_family="Arial"
+        ),
+        
+        # Mobile-friendly legend
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font=dict(size=10)
+        ),
+        
+        # Mobile-friendly title positioning
+        title=dict(
+            y=0.9,  # Position title lower to avoid toolbar
+            x=0.5,
+            font=dict(size=14)
+        )
+    )
+    
+    # Add custom dragmode setting for better mobile touch
+    fig.update_config(
+        scrollZoom=False,  # Disable scroll zooming on mobile
+        displayModeBar='hover'  # Show toolbar only on hover
+    )
+    
+    return fig
 
 # Main application class
 class SmallBusinessDashboard:
@@ -1166,7 +1383,8 @@ class SmallBusinessDashboard:
             transition_duration=500
         )
         
-        return fig
+        # Apply mobile-friendly settings
+        return configure_chart_for_mobile(fig)
     
     def create_barriers_chart(self, filtered_data):
         """Create chart for biggest barriers"""
@@ -1228,7 +1446,8 @@ class SmallBusinessDashboard:
                 transition_duration=500
             )
             
-            return fig
+            # Apply mobile-friendly settings
+            return configure_chart_for_mobile(fig)
         except Exception as e:
             logger.error(f"Error creating barriers chart: {str(e)}")
             # Create an empty figure
@@ -1239,7 +1458,8 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#333333')
             )
-            return fig
+            # Apply mobile-friendly settings even for error state
+            return configure_chart_for_mobile(fig)
     
     def create_complexity_by_affiliation_chart(self, filtered_data):
         """Create chart showing complexity by affiliation"""
@@ -1284,7 +1504,8 @@ class SmallBusinessDashboard:
                     transition_duration=500
                 )
                 
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
             else:
                 # Create an empty figure
                 fig = go.Figure()
@@ -1294,7 +1515,8 @@ class SmallBusinessDashboard:
                     plot_bgcolor='#F8F9FA',
                     font=dict(color='#333333')
                 )
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
         except Exception as e:
             logger.error(f"Error creating complexity chart: {str(e)}")
             # Create an empty figure
@@ -1305,7 +1527,8 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#333333')
             )
-            return fig
+            # Apply mobile-friendly settings
+            return configure_chart_for_mobile(fig)
     
     def create_timeline_distribution_chart(self, filtered_data):
         """Create chart showing timeline distribution"""
@@ -1368,7 +1591,8 @@ class SmallBusinessDashboard:
                     transition_duration=500
                 )
                 
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
             else:
                 # Create an empty figure
                 fig = go.Figure()
@@ -1378,7 +1602,8 @@ class SmallBusinessDashboard:
                     plot_bgcolor='#F8F9FA',
                     font=dict(color='#333333')
                 )
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
         except Exception as e:
             logger.error(f"Error creating timeline chart: {str(e)}")
             # Create an empty figure
@@ -1389,7 +1614,8 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#333333')
             )
-            return fig
+            # Apply mobile-friendly settings
+            return configure_chart_for_mobile(fig)
     
     def create_needed_resources_chart(self, filtered_data):
         """Create chart for needed resources"""
@@ -1657,7 +1883,8 @@ class SmallBusinessDashboard:
                     textinfo='percent+label'
                 )
                 
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
             else:
                 # Create an empty figure
                 fig = go.Figure()
@@ -1667,7 +1894,8 @@ class SmallBusinessDashboard:
                     plot_bgcolor='#F8F9FA',
                     font=dict(color='#333333')
                 )
-                return fig
+                # Apply mobile-friendly settings
+                return configure_chart_for_mobile(fig)
         except Exception as e:
             logger.error(f"Error creating simplification chart: {str(e)}")
             # Create an empty figure
@@ -1678,7 +1906,8 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#333333')
             )
-            return fig
+            # Apply mobile-friendly settings
+            return configure_chart_for_mobile(fig)
     
     def create_word_cloud_data(self, filtered_data):
         """Prepare data for word cloud visualization"""
@@ -1929,7 +2158,8 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',
                 font=dict(color='#333333')
             )
-            return fig
+            # Apply mobile-friendly settings
+            return configure_chart_for_mobile(fig)
 
 # Main application UI
 def main():
@@ -2356,35 +2586,75 @@ def main():
     # Application header
     html_content('<div class="main-header">📊 Small Business Federal Contracting Dashboard</div>')
     
-    # Executive Summary with proper HTML rendering
-    with st.expander("📋 Executive Summary", expanded=False):
-        # First add the header with length information
-        html_content(f"<h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>")
-        
-        # Add the introduction paragraph
-        html_content(f"<p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>")
-        
-        # Add the insight boxes one by one
-        html_content("""
-        <div class="insight-box">
-            <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
-            understanding where to begin, and meeting cybersecurity requirements.
+    # Executive Summary with mobile-friendly custom expander
+    st.markdown(f"""
+    <style>
+    .custom-expander {{
+        margin-bottom: 30px;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }}
+    .custom-expander-header {{
+        padding: 12px 15px;
+        background-color: #f0f2f6;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }}
+    .custom-expander-content {{
+        padding: 15px;
+        display: none;
+    }}
+    .custom-expander.expanded .custom-expander-content {{
+        display: block;
+    }}
+    </style>
+    <div class="custom-expander" id="exec-summary-expander">
+        <div class="custom-expander-header" onclick="toggleExpander('exec-summary-expander')">
+            📋 Executive Summary <span id="exec-arrow">▼</span>
         </div>
-        """)
-        
-        html_content("""
-        <div class="insight-box">
-            <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
-            indicating significant onboarding barriers.
+        <div class="custom-expander-content">
+            <h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>
+            
+            <p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
+                understanding where to begin, and meeting cybersecurity requirements.
+            </div>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
+                indicating significant onboarding barriers.
+            </div>
+            
+            <div class="insight-box">
+                <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
+                is the most requested resource across all stakeholder groups.
+            </div>
         </div>
-        """)
-        
-        html_content("""
-        <div class="insight-box">
-            <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
-            is the most requested resource across all stakeholder groups.
-        </div>
-        """)
+    </div>
+
+    <script>
+    function toggleExpander(id) {{
+        const expander = document.getElementById(id);
+        expander.classList.toggle('expanded');
+        const arrow = document.getElementById('exec-arrow');
+        if (expander.classList.contains('expanded')) {{
+            arrow.innerText = '▼';
+        }} else {{
+            arrow.innerText = '►';
+        }}
+    }}
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # IMPORTANT: Place a spacer after the executive summary to ensure separation from tabs
+    st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
     
     # Sidebar for filters
     st.sidebar.markdown("### 🔍 Filter Dashboard")
