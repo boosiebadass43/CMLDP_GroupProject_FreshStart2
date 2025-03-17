@@ -11,6 +11,19 @@ import logging
 import warnings
 import random
 
+# Helper function to properly render HTML content
+def html_content(html_string):
+    """Helper function to properly render HTML content"""
+    return st.markdown(html_string, unsafe_allow_html=True)
+
+# Chart color constants
+CHART_COLORS = {
+    'primary': ['#4361EE', '#4895EF', '#4CC9F0', '#3F37C9', '#3A0CA3', '#7209B7'],
+    'secondary': ['#F72585', '#B5179E', '#7209B7', '#560BAD', '#480CA8', '#3A0CA3'],
+    'categorical': ['#4361EE', '#3A86FF', '#4CC9F0', '#FF9F1C', '#FF9800', '#F72585'],
+    'sequential': ['#caf0f8', '#90e0ef', '#48cae4', '#00b4d8', '#0096c7', '#0077b6', '#023e8a']
+}
+
 # Set page configuration first, before any other st commands
 st.set_page_config(
     page_title="Small Business Federal Contracting Dashboard",
@@ -19,11 +32,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Add comprehensive CSS overrides to force light mode
+# Add enhanced visual aesthetics with colors and animations
 st.markdown("""
 <style>
-/* Force light mode theme - override Streamlit's theme settings */
+/* Color palette and visual enhancements */
 :root {
+    --primary: #4361EE;
+    --primary-light: #4895EF;
+    --secondary: #3F37C9;
+    --accent: #4CC9F0;
+    --text-dark: #333333;
+    --text-light: #F8F9FA;
+    --background: #FFFFFF;
+    --card-bg: #F8F9FA;
+    --success: #4CAF50;
+    --warning: #FF9800;
     --background-color: #FFFFFF;
     --secondary-background-color: #F8F9FA;
     --text-color: #333333;
@@ -45,17 +68,53 @@ st.markdown("""
     color: #333333 !important;
 }
 
+/* Subtle card styling */
+div.stBlock {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+div.stBlock:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling */
+button {
+    transition: all 0.2s ease !important;
+}
+
+button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
 /* Ensure metric cards have light background */
 [data-testid="stMetric"] {
     background-color: #F8F9FA !important;
     padding: 15px !important;
-    border-radius: 5px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+    border-left: 4px solid var(--primary);
+    transition: all 0.25s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    border-left: 4px solid var(--accent);
 }
 
 /* Chart backgrounds */
 .js-plotly-plot .plotly {
     background-color: #FFFFFF !important;
+    transition: all 0.3s ease;
+}
+
+.js-plotly-plot .plotly:hover {
+    transform: scale(1.01);
 }
 
 /* Input widgets */
@@ -70,17 +129,37 @@ st.markdown("""
 
 /* Buttons */
 .stButton > button {
-    background-color: #4B5CFF !important;
+    background-color: var(--primary) !important;
     color: white !important;
+    transition: all 0.2s ease !important;
 }
 
-/* Tabs */
+.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    background-color: var(--primary-light) !important;
+}
+
+/* Tabs styling */
 .stTabs [data-baseweb="tab-list"] {
     background-color: #F8F9FA !important;
+    gap: 8px;
+    padding-bottom: 10px;
 }
 
 .stTabs [data-baseweb="tab"] {
     color: #333333 !important;
+    border-radius: 4px 4px 0 0;
+    padding: 10px 16px;
+    transition: all 0.2s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.stTabs [data-baseweb="tab-highlight"] {
+    background-color: var(--primary);
 }
 
 /* Data tables */
@@ -92,6 +171,48 @@ st.markdown("""
 code {
     background-color: #F0F0F0 !important;
     color: #333333 !important;
+}
+
+/* Fix for HTML content rendering */
+.stMarkdown div p, .stMarkdown div ul, .stMarkdown div h3, .stMarkdown div div {
+    font-family: 'Source Sans Pro', sans-serif !important;
+    color: var(--text-dark) !important;
+}
+
+/* Progress bars */
+.stProgress > div > div > div > div {
+    background-color: var(--primary) !important;
+}
+
+/* Expanders */
+.streamlit-expanderHeader {
+    font-weight: 600 !important;
+    color: var(--text-dark) !important;
+    transition: all 0.2s ease;
+}
+
+.streamlit-expanderHeader:hover {
+    color: var(--primary) !important;
+}
+
+/* Filter multiselect */
+.stMultiSelect [data-baseweb="tag"] {
+    background-color: var(--primary-light);
+}
+
+/* Animation for page loading */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.element-container {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Ensures HTML renders properly */
+.stMarkdown {
+    overflow: auto;
 }
 
 /* Override any SVG elements */
@@ -774,7 +895,7 @@ class SmallBusinessDashboard:
             labels={'x': 'Count', 'y': 'Hurdle'},
             title='Most Significant Onboarding Hurdles',
             color=hurdle_counts.values,
-            color_continuous_scale=px.colors.sequential.Blues
+            color_continuous_scale=CHART_COLORS['sequential']
         )
         
         fig.update_layout(
@@ -784,7 +905,8 @@ class SmallBusinessDashboard:
             paper_bgcolor='#FFFFFF',
             plot_bgcolor='#F8F9FA',
             font=dict(color='#333333'),
-            margin=dict(l=50, r=20, t=50, b=100)
+            margin=dict(l=50, r=20, t=50, b=100),
+            transition_duration=500
         )
         
         return fig
@@ -861,7 +983,7 @@ class SmallBusinessDashboard:
                     labels={'affiliation_category': 'Affiliation', 'onboarding_complexity': 'Average Complexity Rating'},
                     title='Onboarding Complexity by Respondent Type',
                     color='onboarding_complexity',
-                    color_continuous_scale=px.colors.sequential.Greens
+                    color_continuous_scale=CHART_COLORS['sequential']
                 )
                 
                 fig.update_layout(
@@ -1068,8 +1190,8 @@ class SmallBusinessDashboard:
                 'Display': [f"{round(percentages[k], 1)}%" for k in factors.keys()]
             }).sort_values('Count', ascending=False).head(10)  # Focus on top 10 for clarity
             
-            # Create a professional color palette
-            color_scale = px.colors.sequential.Teal
+            # Use our enhanced color palette
+            color_scale = CHART_COLORS['sequential']
             
             # Create the enhanced horizontal bar chart
             fig = px.bar(
@@ -1120,6 +1242,7 @@ class SmallBusinessDashboard:
                 plot_bgcolor='#F8F9FA',  # Light background
                 paper_bgcolor='#FFFFFF',  # White paper background
                 margin={'l': 50, 'r': 20, 't': 50, 'b': 100},  # Adjusted margins for readability
+                transition_duration=500,  # Add smooth transition effect
                 hoverlabel={
                     'bgcolor': '#F8F9FA',
                     'font_size': 14,
@@ -1920,37 +2043,37 @@ def main():
     """, unsafe_allow_html=True)
     
     # Application header
-    st.markdown('<div class="main-header">📊 Small Business Federal Contracting Dashboard</div>', unsafe_allow_html=True)
+    html_content('<div class="main-header">📊 Small Business Federal Contracting Dashboard</div>')
     
     # Executive Summary with proper HTML rendering
     with st.expander("📋 Executive Summary", expanded=False):
         # First add the header with length information
-        st.markdown(f"<h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>", unsafe_allow_html=True)
+        html_content(f"<h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>")
         
         # Add the introduction paragraph
-        st.markdown(f"<p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>", unsafe_allow_html=True)
+        html_content(f"<p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>")
         
         # Add the insight boxes one by one
-        st.markdown("""
+        html_content("""
         <div class="insight-box">
             <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
             understanding where to begin, and meeting cybersecurity requirements.
         </div>
-        """, unsafe_allow_html=True)
+        """)
         
-        st.markdown("""
+        html_content("""
         <div class="insight-box">
             <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
             indicating significant onboarding barriers.
         </div>
-        """, unsafe_allow_html=True)
+        """)
         
-        st.markdown("""
+        html_content("""
         <div class="insight-box">
             <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
             is the most requested resource across all stakeholder groups.
         </div>
-        """, unsafe_allow_html=True)
+        """)
     
     # Sidebar for filters
     st.sidebar.markdown("### 🔍 Filter Dashboard")
@@ -2043,7 +2166,7 @@ def main():
     
     # Tab 1: Key Challenges
     with tab1:
-        st.markdown('<div class="sub-header">🚩 Key Challenges Facing Small Businesses</div>', unsafe_allow_html=True)
+        html_content('<div class="sub-header">🚩 Key Challenges Facing Small Businesses</div>')
         
         # Row for key metrics
         col1, col2, col3 = st.columns(3)
@@ -2225,11 +2348,11 @@ def main():
         """, unsafe_allow_html=True)
         
         # Challenging factors with improved section styling - Fixed text rendering
-        st.markdown("""
+        html_content("""
         <div class="analysis-section">
             <div class="section-title">📊 Most Challenging Factors for Small Businesses</div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
         
         # Break up the content into smaller chunks for better rendering
         st.markdown("The chart below shows the factors that small businesses identified as most challenging when pursuing federal contracts. These obstacles represent key areas where policy interventions could have the greatest impact.")
@@ -2336,7 +2459,7 @@ def main():
     
     # Tab 3: Open-Ended Responses
     with tab3:
-        st.markdown('<div class="sub-header">💬 Analysis of Open-Ended Responses</div>', unsafe_allow_html=True)
+        html_content('<div class="sub-header">💬 Analysis of Open-Ended Responses</div>')
         
         # Function to display all responses for a selected theme
         def display_theme_responses(df_responses, selected_theme, selected_sentiment="All"):
@@ -3013,7 +3136,7 @@ def main():
     
     # Tab 4: Recommendations
     with tab4:
-        st.markdown('<div class="sub-header">🚀 Recommendations Based on Survey Findings</div>', unsafe_allow_html=True)
+        html_content('<div class="sub-header">🚀 Recommendations Based on Survey Findings</div>')
         
         # Add custom CSS for recommendation cards
         st.markdown("""
