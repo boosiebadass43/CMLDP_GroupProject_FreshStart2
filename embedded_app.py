@@ -1731,23 +1731,51 @@ def main():
     }
     
     /* Card styling with improved spacing and visual hierarchy */
-    .card {
+    .card, .recommendation-card {
         background-color: #ffffff;
         border-radius: 10px;
         padding: 1.8rem;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 1.5rem;
-        height: 180px; /* Fixed height for metric cards */
+        min-height: 180px; /* Minimum height instead of fixed height */
+        height: auto !important; /* Allow cards to grow with content */
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start; /* Align content to top instead of center */
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         border: 1px solid #eee;
+        overflow: visible !important; /* Ensure content doesn't get cut off */
+    }
+    
+    /* Recommendation cards specific styling */
+    .recommendation-card ul {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .recommendation-card li {
+        margin-bottom: 0.5rem;
     }
 
-    .card:hover {
+    .card:hover, .recommendation-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Fix for outcome cards with icons */
+    .recommendation-card .flex-container {
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .recommendation-card .icon {
+        font-size: 3rem;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+    
+    .recommendation-card .content {
+        flex-grow: 1;
     }
     
     .metric-value {
@@ -2746,9 +2774,46 @@ def main():
     with tab4:
         st.markdown('<div class="sub-header">🚀 Recommendations Based on Survey Findings</div>', unsafe_allow_html=True)
         
-        # Recommendation cards
+        # Add custom CSS for recommendation cards
         st.markdown("""
-        <div class="card">
+        <style>
+        /* Custom styling for recommendation cards to prevent overflow */
+        .recommendation-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 1.8rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            height: auto !important;
+            min-height: 100px;
+            border: 1px solid #eee;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .recommendation-card h3 {
+            margin-bottom: 1rem;
+            color: #0A2F51;
+        }
+        
+        .recommendation-card ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation-card li {
+            margin-bottom: 0.5rem;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Recommendation cards with improved styling
+        st.markdown("""
+        <div class="recommendation-card">
             <h3>🌟 Primary Recommendation: Centralized Getting Started Portal</h3>
             <p>Based on survey responses, the most impactful improvement would be a centralized portal with step-by-step guidance for small businesses.</p>
             <p><b>Key features should include:</b></p>
@@ -2761,7 +2826,7 @@ def main():
             <p><b>Expected Impact:</b> Reduced onboarding time by 30-50% based on respondent feedback.</p>
         </div>
         
-        <div class="card">
+        <div class="recommendation-card">
             <h3>📚 Recommendation 2: Enhanced Training & Mentorship</h3>
             <p>Develop tailored training and mentorship programs to address the knowledge gap in federal procurement.</p>
             <p><b>Key components:</b></p>
@@ -2772,7 +2837,7 @@ def main():
             </ul>
         </div>
         
-        <div class="card">
+        <div class="recommendation-card">
             <h3>🔄 Recommendation 3: Streamlined Registration Process</h3>
             <p>Simplify the registration and certification processes to reduce administrative burden.</p>
             <p><b>Key improvements:</b></p>
@@ -2783,7 +2848,7 @@ def main():
             </ul>
         </div>
         
-        <div class="card">
+        <div class="recommendation-card">
             <h3>📋 Recommendation 4: Standardized Templates & Requirements</h3>
             <p>Develop standardized templates and simplified requirements for small business proposals.</p>
             <p><b>Key features:</b></p>
@@ -2806,10 +2871,10 @@ def main():
         
         # Expanded outcome cards in a larger format
         st.markdown("""
-        <div class="card">
-            <div style="display: flex; align-items: center;">
-                <div style="font-size: 3rem; margin-right: 20px;">⏱️</div>
-                <div style="flex-grow: 1;">
+        <div class="recommendation-card">
+            <div class="flex-container">
+                <div class="icon">⏱️</div>
+                <div class="content">
                     <h3>Time to First Contract: 40% Reduction</h3>
                     <p>Based on survey data, small businesses currently spend an average of 18 months securing their first federal contract.
                     Our centralized portal and streamlined registration process is projected to reduce this timeline to approximately 11 months.</p>
@@ -2822,10 +2887,10 @@ def main():
         """, unsafe_allow_html=True)
         
         st.markdown("""
-        <div class="card">
-            <div style="display: flex; align-items: center;">
-                <div style="font-size: 3rem; margin-right: 20px;">📈</div>
-                <div style="flex-grow: 1;">
+        <div class="recommendation-card">
+            <div class="flex-container">
+                <div class="icon">📈</div>
+                <div class="content">
                     <h3>Small Business Participation: 25% Increase</h3>
                     <p>Survey data indicates that for every 100 small businesses that begin the federal contracting process, 
                     only about 40 complete it successfully. Our recommendations aim to increase this completion rate to approximately 50 businesses.</p>
@@ -2839,10 +2904,10 @@ def main():
         """, unsafe_allow_html=True)
         
         st.markdown("""
-        <div class="card">
-            <div style="display: flex; align-items: center;">
-                <div style="font-size: 3rem; margin-right: 20px;">💰</div>
-                <div style="flex-grow: 1;">
+        <div class="recommendation-card">
+            <div class="flex-container">
+                <div class="icon">💰</div>
+                <div class="content">
                     <h3>Contract Success Rate: 35% Improvement</h3>
                     <p>Currently, small businesses report a success rate of approximately 15% when bidding on federal contracts. 
                     Our recommendations, particularly enhanced training and standardized templates, are projected to increase this to about 20%.</p>
@@ -2855,128 +2920,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Next Steps section
-        st.markdown('<div class="sub-header">👣 Next Steps</div>', unsafe_allow_html=True)
-        
-        # Create a card with the same visual style as the others
-        st.markdown("""
-        <div class="card">
-            <h3>Actionable Path Forward</h3>
-            <p>Based on our analysis, we recommend the following immediate actions:</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Add a container for the list with custom styling
-        list_container = st.container()
-        with list_container:
-            st.markdown("""
-            <style>
-            .next-steps-list {
-                background-color: #ffffff;
-                border-radius: 10px;
-                padding: 25px;
-                margin-top: 20px;
-                margin-bottom: 25px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-                border: 1px solid #f0f0f0;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-            }
-            
-            .next-steps-list:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-            }
-            
-            .step-item {
-                display: flex;
-                align-items: flex-start;
-                margin-bottom: 18px;
-                padding-bottom: 18px;
-                border-bottom: 1px solid #f0f0f0;
-            }
-            
-            .step-item:last-child {
-                margin-bottom: 0;
-                padding-bottom: 0;
-                border-bottom: none;
-            }
-            
-            .step-number {
-                background-color: #0A2F51;
-                color: white;
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 15px;
-                font-weight: bold;
-                flex-shrink: 0;
-            }
-            
-            .step-content {
-                flex-grow: 1;
-            }
-            
-            .step-title {
-                font-weight: bold;
-                font-size: 1.1rem;
-                margin-bottom: 5px;
-                color: #333;
-            }
-            
-            .step-description {
-                color: #555;
-                line-height: 1.5;
-            }
-            </style>
-            
-            <div class="next-steps-list">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-title">Convene a Small Business Advisory Council</div>
-                        <div class="step-description">Comprising diverse stakeholders to provide ongoing feedback during implementation and ensure solutions address real-world challenges.</div>
-                    </div>
-                </div>
-                
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-title">Conduct a Technical Assessment</div>
-                        <div class="step-description">Of existing systems to identify integration points for the centralized portal and determine technical requirements.</div>
-                    </div>
-                </div>
-                
-                <div class="step-item">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-title">Develop a Phased Implementation Plan</div>
-                        <div class="step-description">With clear milestones, starting with the most impactful improvements that can be achieved in the near term.</div>
-                    </div>
-                </div>
-                
-                <div class="step-item">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <div class="step-title">Establish Key Performance Indicators</div>
-                        <div class="step-description">To track progress against the expected outcomes and measure the impact of implemented changes.</div>
-                    </div>
-                </div>
-                
-                <div class="step-item">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <div class="step-title">Allocate Development Resources</div>
-                        <div class="step-description">To begin work on the centralized portal prototype and other high-priority implementation items.</div>
-                    </div>
-                </div>
-                
-                <hr style="margin-top: 25px; margin-bottom: 25px; border-color: #e5e5e5;">
-                <p style="font-style: italic; color: #555; text-align: center;">We recommend quarterly progress reviews with stakeholders to ensure implementations remain aligned with small business needs.</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # End of Recommendations section - Next steps removed
 
 if __name__ == "__main__":
     main()
