@@ -2451,54 +2451,50 @@ def main():
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
                 
-                def metric_content():
-                    st.markdown(f"""
-                    <div style="text-align: center; width: 100%;">
-                        <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Average Complexity Rating</div>
-                        <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{avg_complexity}/5</div>
-                        <div style="color: #666;">Rated by {len(filtered_data)} respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                card_container(metric_content)
+                # Direct card using HTML
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{avg_complexity}/5</div>
+                    <div style="color: #666; font-size: 0.9rem;">Rated by {len(filtered_data)} respondents</div>
+                </div>
+                """, unsafe_allow_html=True)
             except:
-                def metric_content():
-                    st.markdown(f"""
-                    <div style="text-align: center; width: 100%;">
-                        <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Average Complexity Rating</div>
-                        <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                        <div style="color: #666;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                card_container(metric_content)
+                # Direct card using HTML for error case
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem;">Data not available</div>
+                </div>
+                """, unsafe_allow_html=True)
             
         with col2:
             try:
                 most_common_timeline = filtered_data['timeline_first_contract'].value_counts().index[0]
                 timeline_pct = round(filtered_data['timeline_first_contract'].value_counts().iloc[0] / len(filtered_data) * 100)
                 
-                def metric_content():
-                    st.markdown(f"""
-                    <div style="text-align: center; width: 100%;">
-                        <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Most Common Timeline</div>
-                        <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{most_common_timeline}</div>
-                        <div style="color: #666;">{timeline_pct}% of respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                card_container(metric_content)
+                # Direct card using HTML
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{most_common_timeline}</div>
+                    <div style="color: #666; font-size: 0.9rem;">{timeline_pct}% of respondents</div>
+                </div>
+                """, unsafe_allow_html=True)
             except:
-                def metric_content():
-                    st.markdown(f"""
-                    <div style="text-align: center; width: 100%;">
-                        <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Most Common Timeline</div>
-                        <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                        <div style="color: #666;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                card_container(metric_content)
+                # Direct card using HTML for error case
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem;">Data not available</div>
+                </div>
+                """, unsafe_allow_html=True)
             
         with col3:
             try:
@@ -2525,42 +2521,37 @@ def main():
                     # Get the cleaned top resource text (remove quotes if present)
                     cleaned_resource = top_resource.replace('"getting started"', 'getting started')
                     
-                    # Create a card showing only the most requested resource
-                    def metric_content():
-                        st.markdown(f"""
-                        <div style="text-align: center; width: 100%;">
-                            <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Most Requested Resource</div>
-                            <div class="metric-value" style="font-size: 1.5rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{cleaned_resource}</div>
-                            <div style="color: #666;">{percentage}% of resource mentions</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    card_container(metric_content)
+                    # Direct card using HTML
+                    st.markdown(f"""
+                    <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                                padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{cleaned_resource}</div>
+                        <div style="color: #666; font-size: 0.9rem;">{percentage}% of resource mentions</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 else:
                     # Fallback for when no data is available
-                    def metric_content():
-                        st.markdown(f"""
-                        <div style="text-align: center; width: 100%;">
-                            <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Most Requested Resource</div>
-                            <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                            <div style="color: #666;">No resource data available</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    card_container(metric_content)
+                    st.markdown(f"""
+                    <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                                padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
+                        <div style="color: #666; font-size: 0.9rem;">No resource data available</div>
+                    </div>
+                    """, unsafe_allow_html=True)
             except Exception as e:
                 logger.error(f"Error displaying most requested resource: {str(e)}")
                 
-                def metric_content():
-                    st.markdown(f"""
-                    <div style="text-align: center; width: 100%;">
-                        <div class="metric-label" style="font-weight: bold; margin-bottom: 8px;">Most Requested Resource</div>
-                        <div class="metric-value" style="font-size: 2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                        <div style="color: #666;">Error processing data</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                card_container(metric_content)
+                # Direct card using HTML for error case
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 100%; margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem;">Error processing data</div>
+                </div>
+                """, unsafe_allow_html=True)
         
         # Add vertical space before visualizations
         add_vertical_space(3)
