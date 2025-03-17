@@ -54,24 +54,194 @@ def card_container(content_function):
         content_function()
         st.markdown("</div>", unsafe_allow_html=True)
 
-# Helper function for mobile-friendly chart rendering
-def render_mobile_chart(fig, use_container_width=True):
-    """Render a plotly chart with mobile-friendly configuration
+# Smart Device Detection
+def is_likely_mobile():
+    """Detect if the current device is likely a mobile device
     
-    This function applies mobile-friendly configuration to a plotly chart.
+    Uses JavaScript to detect screen width and stores the result in query params
     """
-    # Apply mobile-friendly settings
-    mobile_fig = configure_chart_for_mobile(fig)
+    # Use JavaScript to detect screen size
+    device_script = """
+    <script>
+        if (window.innerWidth < 768) {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('mobile')) {
+                window.parent.postMessage({type: 'streamlit:setQueryParam', queryParams: {'mobile': 'true'}}, '*');
+            }
+        }
+    </script>
+    """
+    st.markdown(device_script, unsafe_allow_html=True)
     
-    # Use additional config options for better mobile experience
+    # Check for mobile parameter in URL
+    mobile_param = st.experimental_get_query_params().get('mobile', [False])[0]
+    return mobile_param == 'true'
+
+# Function to handle device-specific optimizations
+def optimize_for_device():
+    """Get device-specific optimization parameters
+    
+    Returns a dictionary with device-specific parameters like column count,
+    chart height, and other parameters
+    """
+    is_mobile = is_likely_mobile()
+    
+    return {
+        'is_mobile': is_mobile,
+        'column_count': 1 if is_mobile else 2,
+        'chart_height': 350 if is_mobile else 500,
+        'font_size': 10 if is_mobile else 14,
+        'title_size': 14 if is_mobile else 18,
+        'points_limit': 20 if is_mobile else 100  # For data simplification
+    }
+
+# Function to simplify data for mobile
+def simplify_data(data, limit=20):
+    """Simplify data for mobile devices by sampling or aggregating
+    
+    For time-series or large datasets, this reduces points to improve performance
+    """
+    if len(data) > limit:
+        # Simple sampling (every nth point)
+        sample_rate = max(1, len(data) // limit)
+        return data[::sample_rate]
+    return data
+
+# Content prioritization for mobile view
+def display_content_by_priority(content_blocks, is_mobile=None):
+    """Display content blocks based on priority for the current device
+    
+    Allows different ordering and visibility of content elements based on device
+    
+    Args:
+        content_blocks: Dict of content blocks with keys as identifiers and values as dicts with
+                      'content': callable that renders content
+                      'priority': int (lower numbers = higher priority)
+                      'show_on_mobile': bool
+        is_mobile: Bool indicating if device is mobile. If None, auto-detects.
+    """
+    if is_mobile is None:
+        is_mobile = is_likely_mobile()
+    
+    # Sort blocks by priority
+    sorted_blocks = sorted(
+        [(block_id, block) for block_id, block in content_blocks.items()],
+        key=lambda x: x[1].get('priority', 99)
+    )
+    
+    # Render blocks in priority order, respecting mobile visibility
+    for block_id, block in sorted_blocks:
+        if not is_mobile or (is_mobile and block.get('show_on_mobile', True)):
+            # If it's a callable, call it to render content
+            if callable(block.get('content')):
+                block['content']()
+            # If it's a streamlit element or plain content
+            elif 'content' in block:
+                st.markdown(block['content'], unsafe_allow_html=True)
+
+# Lazy load charts on mobile
+def lazy_load_chart(chart_function, chart_id, data=None, button_text="Load Chart"):
+    """Lazy load charts on mobile devices to improve performance
+    
+    Args:
+        chart_function: Function that renders the chart
+        chart_id: Unique identifier for this chart
+        data: Data to pass to the chart function
+        button_text: Text for the load button
+    """
+    # Initialize session state for this chart if not exists
+    if f'load_{chart_id}' not in st.session_state:
+        st.session_state[f'load_{chart_id}'] = not is_likely_mobile()
+    
+    # If already loaded or not mobile, render the chart
+    if st.session_state[f'load_{chart_id}']:
+        return chart_function(data) if data is not None else chart_function()
+    else:
+        # Show placeholder with load button
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown(f"**Chart: {chart_id}** (Load to view)")
+        with col2:
+            if st.button(button_text, key=f"btn_{chart_id}"):
+                st.session_state[f'load_{chart_id}'] = True
+                # Request rerun to render the chart
+                st.experimental_rerun()
+
+# Enhanced helper function for mobile-friendly chart rendering
+def render_mobile_chart(fig, data=None, use_container_width=True):
+    """Render a plotly chart with enhanced mobile-friendly configuration
+    
+    This function applies comprehensive mobile optimizations to charts
+    """
+    device = optimize_for_device()
+    is_mobile = device['is_mobile']
+    
+    # Optionally simplify data for mobile
+    if data is not None and is_mobile and hasattr(data, '__len__') and len(data) > device['points_limit']:
+        # Would need to recreate the figure with simplified data
+        # This is a placeholder - actual implementation depends on chart type
+        pass
+    
+    # Apply mobile-friendly settings with device-specific values
+    fig.update_layout(
+        # Adjust height based on device
+        height=device['chart_height'],
+        
+        # Increase margins for better touch on mobile
+        margin=dict(t=80 if is_mobile else 60, 
+                   r=20, 
+                   b=60 if is_mobile else 40, 
+                   l=40),
+        
+        # Enhanced hoverlabels for touch
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12,
+            font_family="Arial",
+            bordercolor="#4361EE" if is_mobile else None,  # More visible on mobile
+            namelength=-1  # Show full field names
+        ),
+        
+        # Mobile-optimized legend
+        legend=dict(
+            orientation="h" if is_mobile else "v",
+            yanchor="bottom" if is_mobile else "auto",
+            y=1.02 if is_mobile else None,
+            xanchor="right" if is_mobile else "auto",
+            x=1 if is_mobile else None,
+            font=dict(size=device['font_size'])
+        ),
+        
+        # Mobile-friendly title positioning
+        title=dict(
+            y=0.95,  # Position title lower to avoid toolbar
+            x=0.5,
+            font=dict(size=device['title_size'], color='#000000', family='Arial, sans-serif')
+        ),
+        
+        # Ensure fonts are readable on mobile
+        font=dict(
+            size=device['font_size'],
+            color='#000000',
+            family='Arial, sans-serif'
+        )
+    )
+    
+    # Enhanced config options for better mobile experience
     config = {
-        'scrollZoom': False,
-        'displayModeBar': 'hover',
-        'responsive': True
+        'scrollZoom': False,                      # Disable scroll zooming on mobile
+        'displayModeBar': 'hover',                # Show toolbar only on hover
+        'responsive': True,                       # Ensure responsiveness
+        'doubleClick': 'reset',                   # Double-click to reset view
+        'showTips': True,                         # Show tooltips for better usability
+        # Remove complex interactions on mobile that are hard with touch
+        'modeBarButtonsToRemove': [
+            'select2d', 'lasso2d', 'autoScale2d'
+        ] if is_mobile else []
     }
     
     # Render the chart with the improved config
-    return st.plotly_chart(mobile_fig, use_container_width=use_container_width, config=config)
+    return st.plotly_chart(fig, use_container_width=use_container_width, config=config)
 
 # Add comprehensive CSS for spacing, visual hierarchy, and layout balance
 st.markdown("""
@@ -576,6 +746,7 @@ svg text {
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
         padding-top: 1rem !important;
+        padding-bottom: 80px !important; /* Make room for bottom navigation */
     }
     
     /* Optimize sidebar for mobile */
@@ -588,9 +759,27 @@ svg text {
         grid-template-columns: 1fr !important;
     }
     
-    /* Better touch targets for mobile */
-    button, select, input {
+    /* Enhanced touch targets for mobile - Apply to all clickable elements */
+    button, 
+    select, 
+    input, 
+    .stButton > button,
+    .stSelectbox [data-baseweb="select"] > div,
+    [data-testid="StyledFullScreenButton"], 
+    .modebar-btn,
+    [role="button"],
+    a {
         min-height: 44px !important; /* Apple's recommended minimum */
+        min-width: 44px !important;  /* Ensure square touch targets */
+        padding: 10px !important;    /* Sufficient internal padding */
+        touch-action: manipulation !important; /* Disable double-tap zoom */
+    }
+    
+    /* Make checkboxes and radio buttons more tappable */
+    [data-testid="stCheckbox"] > div > label,
+    [data-testid="stRadio"] > div > label {
+        padding: 10px 8px !important;
+        margin: 5px 0 !important;
     }
     
     /* Fix for plotly modebar (toolbar) */
@@ -598,6 +787,14 @@ svg text {
         top: 0 !important;
         right: 0 !important;
         background: rgba(255,255,255,0.7) !important;
+        border-radius: 4px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Make sure modebar buttons are touch-friendly */
+    .modebar-btn {
+        padding: 8px !important;
+        margin: 4px !important;
         border-radius: 4px !important;
     }
     
@@ -622,6 +819,87 @@ svg text {
     /* Adjust spacing for content after tabs */
     .stTabs + div {
         margin-top: 1rem !important;
+    }
+    
+    /* Add swipe indicators for charts */
+    .chart-container::before {
+        content: "←→";
+        display: block;
+        text-align: center;
+        color: #888;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; }
+        100% { opacity: 0.4; }
+    }
+    
+    /* Fixed bottom navigation for mobile */
+    .mobile-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 10px 5px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        border-top: 1px solid #eee;
+        height: 60px;
+    }
+    
+    .mobile-nav-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+        min-height: 50px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+        font-size: 0.75rem;
+    }
+    
+    .mobile-nav-button:active {
+        background-color: #f0f0f0;
+    }
+    
+    .mobile-nav-button .icon {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+    
+    /* Add some loading animation for lazy-loaded content */
+    .loading-placeholder {
+        height: 200px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    /* Improve scrollability on touch devices */
+    .main .block-container {
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Fix for zoom/pan gestures on charts */
+    .js-plotly-plot .plotly {
+        touch-action: pan-y !important;
     }
 }
 
@@ -2889,13 +3167,28 @@ def main():
         
         # Visualizations for tab 1 with container for consistent spacing
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
         
-        with col1:
-            render_mobile_chart(dashboard.create_hurdles_chart(filtered_data))
-            
-        with col2:
-            render_mobile_chart(dashboard.create_barriers_chart(filtered_data))
+        # Device-optimized layout
+        device = optimize_for_device()
+        cols = st.columns(device['column_count'])
+        
+        if device['is_mobile']:
+            # Single column for mobile
+            with cols[0]:
+                render_mobile_chart(dashboard.create_hurdles_chart(filtered_data))
+                
+                # Add vertical space between charts on mobile
+                st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+                
+                render_mobile_chart(dashboard.create_barriers_chart(filtered_data))
+        else:
+            # Two columns for desktop
+            with cols[0]:
+                render_mobile_chart(dashboard.create_hurdles_chart(filtered_data))
+                
+            with cols[1]:
+                render_mobile_chart(dashboard.create_barriers_chart(filtered_data))
+                
         st.markdown('</div>', unsafe_allow_html=True)
             
         # Add vertical space after visualizations
@@ -3005,7 +3298,16 @@ def main():
         
         # Challenging factors horizontal bar chart with improved formatting
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        render_mobile_chart(dashboard.create_challenging_factors_chart(filtered_data))
+        # Use lazy loading for heavy charts on mobile devices
+        if is_likely_mobile():
+            lazy_load_chart(
+                lambda: render_mobile_chart(dashboard.create_challenging_factors_chart(filtered_data)),
+                chart_id="challenging_factors",
+                button_text="Load Chart"
+            )
+        else:
+            # On desktop, load immediately
+            render_mobile_chart(dashboard.create_challenging_factors_chart(filtered_data))
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Add vertical spacing between sections
@@ -3043,15 +3345,36 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Break up the content into smaller chunks for better rendering
-        st.markdown("This analysis compares perspectives across different types of stakeholders in the federal contracting ecosystem. Understanding these varying viewpoints is essential for developing solutions that address the needs of all participants.")
+        # Use content prioritization for better mobile experience
+        content_blocks = {
+            'intro': {
+                'content': lambda: st.markdown("This analysis compares perspectives across different types of stakeholders in the federal contracting ecosystem. Understanding these varying viewpoints is essential for developing solutions that address the needs of all participants."),
+                'priority': 1,
+                'show_on_mobile': True
+            },
+            'subtitle': {
+                'content': lambda: st.markdown("<div class='section-subtitle'>What to Look For:</div>", unsafe_allow_html=True),
+                'priority': 2,
+                'show_on_mobile': True
+            },
+            'bullet_points': {
+                'content': lambda: (
+                    st.markdown("- Differences in complexity perception between small businesses and other stakeholders"),
+                    st.markdown("- Distribution of respondent types in the survey sample"),
+                    st.markdown("- Variations in reported challenges by respondent category")
+                ),
+                'priority': 3,
+                'show_on_mobile': True
+            },
+            'additional_context': {
+                'content': lambda: st.markdown("The chart below highlights how different stakeholder groups perceive the complexity of the federal contracting process, which can significantly impact how we design support systems for small businesses."),
+                'priority': 4,
+                'show_on_mobile': False  # Hide on mobile to save space
+            }
+        }
         
-        st.markdown("<div class='section-subtitle'>What to Look For:</div>", unsafe_allow_html=True)
-        
-        # Use native Streamlit bullet points
-        st.markdown("- Differences in complexity perception between small businesses and other stakeholders")
-        st.markdown("- Distribution of respondent types in the survey sample")
-        st.markdown("- Variations in reported challenges by respondent category")
+        # Display content in priority order, adapting to device
+        display_content_by_priority(content_blocks)
         
         try:
             # Create a figure with subplots
@@ -3936,6 +4259,53 @@ def main():
         """, unsafe_allow_html=True)
         
         # End of Recommendations section - Next steps removed
+        
+        # Add mobile navigation for touch devices
+        if is_likely_mobile():
+            st.markdown("""
+            <div class="mobile-nav">
+                <a href="#" class="mobile-nav-button" onclick="document.querySelector('[data-baseweb=tab]').click()">
+                    <div class="icon">📊</div>
+                    <div>Key Data</div>
+                </a>
+                <a href="#" class="mobile-nav-button" onclick="document.querySelector('[data-baseweb=tab]:nth-child(2)').click()">
+                    <div class="icon">🔍</div>
+                    <div>Analysis</div>
+                </a>
+                <a href="#" class="mobile-nav-button" onclick="document.querySelector('[data-baseweb=tab]:nth-child(3)').click()">
+                    <div class="icon">💬</div>
+                    <div>Comments</div>
+                </a>
+                <a href="#" class="mobile-nav-button" onclick="document.querySelector('[data-baseweb=tab]:nth-child(4)').click()">
+                    <div class="icon">🚀</div>
+                    <div>Solutions</div>
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add page indicator for mobile users
+            current_tab = st.session_state.get('current_tab', 0)
+            st.markdown(f"""
+            <div style="position: fixed; bottom: 70px; left: 0; right: 0; text-align: center; 
+                       background: rgba(255,255,255,0.8); padding: 5px; font-size: 0.8rem; z-index: 999;">
+                Page {current_tab + 1} of 4
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add touch hint for mobile
+            st.markdown("""
+            <div style="position: fixed; top: 70px; right: 10px; background: rgba(255,255,255,0.8); 
+                       padding: 5px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                       font-size: 0.8rem; color: #555; z-index: 999; animation: fadeOut 5s forwards 3s;">
+                Swipe for more &rarr;
+            </div>
+            <style>
+            @keyframes fadeOut {
+                0% { opacity: 1; }
+                100% { opacity: 0; visibility: hidden; }
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
