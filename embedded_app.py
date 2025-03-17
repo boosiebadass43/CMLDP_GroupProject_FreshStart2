@@ -2338,6 +2338,69 @@ def main():
     with tab3:
         st.markdown('<div class="sub-header">💬 Analysis of Open-Ended Responses</div>', unsafe_allow_html=True)
         
+        # Function to display all responses for a selected theme
+        def display_theme_responses(df_responses, selected_theme, selected_sentiment="All"):
+            """
+            Display all individual responses for the selected theme in an organized, visually appealing way
+            
+            Parameters:
+            - df_responses: DataFrame containing your response data (not used in this implementation)
+            - selected_theme: Currently selected theme from the dropdown
+            - selected_sentiment: Filter for sentiment (All, Positive, Neutral, Negative)
+            """
+            # For this implementation, we'll use our themed data dictionary
+            if selected_theme not in themes:
+                st.warning(f"Theme '{selected_theme}' not found.")
+                return
+                
+            # Get theme data
+            theme_data = themes[selected_theme]
+            
+            # Apply sentiment filter if not "All"
+            filtered_examples = theme_data["examples"]
+            if selected_sentiment != "All":
+                filtered_examples = [ex for ex in filtered_examples if ex["sentiment"].lower() == selected_sentiment.lower()]
+            
+            # Count responses after filtering
+            response_count = len(filtered_examples)
+            
+            # Display theme header with count (maintaining your existing style)
+            st.markdown(f"""
+                <div style="background-color:#1E3A8A; color:white; padding:10px 15px; border-radius:5px; margin-bottom:15px;">
+                    <h3 style="margin:0;">{selected_theme}</h3>
+                    <p style="margin:5px 0 0 0; font-size:0.9rem;">{response_count} responses</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Display theme description
+            st.markdown(f"<p style='margin-bottom:20px;'>{theme_data['description']}</p>", unsafe_allow_html=True)
+            
+            # Begin response grid
+            response_html = '<div class="response-grid">'
+            
+            # Generate card for each response
+            for example in filtered_examples:
+                response_text = example["text"]
+                sentiment = example["sentiment"].lower()
+                
+                # Create card with sentiment indicator
+                response_html += f"""
+                <div class="response-card">
+                    <div class="sentiment-indicator sentiment-{sentiment}"></div>
+                    <p style="margin:0; font-style:italic;">"{response_text}"</p>
+                </div>
+                """
+            
+            # Close response grid
+            response_html += '</div>'
+            
+            # Display all responses in the grid layout
+            st.markdown(response_html, unsafe_allow_html=True)
+            
+            # If no responses match the filter criteria
+            if response_count == 0:
+                st.info(f"No {selected_sentiment.lower() if selected_sentiment != 'All' else ''} responses found for this theme.")
+        
         # Add custom CSS for enhanced card layout and animations
         st.markdown("""
         <style>
@@ -2499,6 +2562,62 @@ def main():
             background-color: #0A2F51;
             color: white;
         }
+        
+        /* Response grid styling for drill-down view */
+        .response-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .response-card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            border-left: 4px solid #1E3A8A;
+            margin-bottom: 0 !important;
+        }
+        .sentiment-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .sentiment-positive {
+            background-color: #10B981;
+        }
+        .sentiment-neutral {
+            background-color: #F59E0B;
+        }
+        .sentiment-negative {
+            background-color: #EF4444;
+        }
+        
+        /* View toggle styling */
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            width: fit-content;
+        }
+        .view-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .view-option.active {
+            background-color: #1E3A8A;
+            color: white;
+        }
         </style>
         """, unsafe_allow_html=True)
         
@@ -2612,6 +2731,20 @@ def main():
             label_visibility="collapsed"  # Hide the label since we have the tabs
         )
         
+        # Add view mode toggle
+        if "view_mode" not in st.session_state:
+            st.session_state.view_mode = "Summary"
+            
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            view_mode = st.radio(
+                "View Mode",
+                ["Summary", "All Responses"],
+                key="view_mode",
+                horizontal=True,
+                label_visibility="collapsed"
+            )
+        
         # Filter for sentiment if needed
         sentiment_filter = st.radio(
             "Filter by sentiment",
@@ -2620,7 +2753,19 @@ def main():
         )
         
         # Display themed responses with enhanced card layout
-        if selected_theme == "All Themes":
+        # For All Responses view mode, use our new drill-down function
+        if view_mode == "All Responses" and selected_theme != "All Themes":
+            # Add a header to explain what the user is viewing
+            st.markdown("""
+            <div style="margin-bottom: 20px; background-color: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #1E3A8A;">
+                <h4 style="margin-top: 0; color: #1E3A8A;">All Responses View</h4>
+                <p style="margin-bottom: 0;">Viewing all individual responses for the selected theme. Use the sentiment filter to narrow results.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Use the dedicated function to display all responses for the selected theme
+            display_theme_responses(None, selected_theme, sentiment_filter)
+        elif selected_theme == "All Themes":
             if search_term:
                 # Filter themes by search term
                 filtered_themes = {}
@@ -2690,6 +2835,14 @@ def main():
                             </div>
                             """, unsafe_allow_html=True)
         else:
+            # Add a header to explain what the user is viewing in summary mode
+            st.markdown("""
+            <div style="margin-bottom: 20px; background-color: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #0A2F51;">
+                <h4 style="margin-top: 0; color: #0A2F51;">Summary View</h4>
+                <p style="margin-bottom: 0;">Viewing a curated selection of representative responses. Switch to "All Responses" view to see every response.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
             # Display detailed view of selected theme
             data = themes[selected_theme]
             
