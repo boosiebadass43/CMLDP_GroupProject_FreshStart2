@@ -32,10 +32,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize session state for modern mode toggle
-if 'modern_mode' not in st.session_state:
-    st.session_state.modern_mode = True
-
 # HELPER FUNCTIONS FOR CONSISTENT SPACING AND LAYOUT
 
 def section_header(title, description=None):
@@ -48,39 +44,14 @@ def add_vertical_space(height=1):
     """Add vertical space with a multiplier of 0.5rem"""
     st.markdown(f"<div style='height:{height*0.5}rem'></div>", unsafe_allow_html=True)
 
-def card_container(content_function, title=None, icon=None, accent_color=None):
-    """Creates an enhanced card container with proper spacing and styling
-    
-    Args:
-        content_function: Function that renders the card content
-        title: Optional title for the card
-        icon: Optional icon for the card title
-        accent_color: Optional accent color for the card (hex code)
-    """
+def card_container(content_function):
+    """Creates a card container with proper spacing"""
     # Create a container first to encapsulate all content
     container = st.container()
-    
     # Then add the card styling and content inside that container
     with container:
-        # Create card with optional styling based on parameters
-        if st.session_state.modern_mode and (title or icon or accent_color):
-            # Modern card with enhanced styling
-            accent_style = f"border-left: 4px solid {accent_color};" if accent_color else ""
-            icon_html = f"{icon} " if icon else ""
-            
-            st.markdown(f"<div class='card' style='{accent_style}'>", unsafe_allow_html=True)
-            
-            # Add title if provided
-            if title:
-                st.markdown(f"<h3 class='card-title'>{icon_html}{title}</h3>", unsafe_allow_html=True)
-                st.markdown("<hr style='margin: 0.5rem 0 1rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
-            
-            content_function()
-        else:
-            # Standard card
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            content_function()
-            
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        content_function()
         st.markdown("</div>", unsafe_allow_html=True)
 
 # Smart Device Detection
@@ -272,134 +243,8 @@ def render_mobile_chart(fig, data=None, use_container_width=True):
     # Render the chart with the improved config
     return st.plotly_chart(fig, use_container_width=use_container_width, config=config)
 
-# Function to toggle modern mode
-def toggle_modern_mode():
-    st.session_state.modern_mode = not st.session_state.modern_mode
-
-# Modern CSS styles with enhanced visual appeal
-def get_modern_css():
-    return """
-    /* Modern UI Variables */
-    :root {
-        --primary-color: #4361EE;
-        --primary-light: #4895EF;
-        --accent-color: #F72585;
-        --text-color: #333333;
-        --background-color: #f9f9fc;
-        --card-background: #ffffff;
-        --border-radius: 12px;
-        --shadow-sm: 0 2px 8px rgba(67, 97, 238, 0.05);
-        --shadow-md: 0 4px 12px rgba(67, 97, 238, 0.08);
-        --shadow-lg: 0 8px 24px rgba(67, 97, 238, 0.12);
-        --transition: all 0.3s ease;
-        --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    /* Modern Body Styling */
-    body {
-        background-color: var(--background-color);
-        color: var(--text-color);
-        font-family: var(--font-family);
-    }
-    
-    /* Modern Card Styling */
-    .card {
-        background: var(--card-background);
-        border-radius: var(--border-radius);
-        padding: 1.5rem;
-        box-shadow: var(--shadow-md);
-        transition: var(--transition);
-        border: none !important;
-        margin-bottom: 1.5rem;
-    }
-    
-    .card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
-    }
-    
-    /* Modern Button Styling */
-    .stButton > button {
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
-        color: white;
-        border: none;
-        transition: var(--transition);
-    }
-    
-    .stButton > button:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-1px);
-    }
-    
-    /* Modern Tab Styling */
-    .stTabs [data-baseweb="tab"] {
-        padding: 1rem 1.5rem;
-        font-weight: 500;
-    }
-    
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 1rem;
-        background-color: transparent;
-    }
-    
-    .stTabs [data-baseweb="tab-highlight"] {
-        background-color: var(--primary-color);
-    }
-    
-    /* Modern Header Styling */
-    h1, h2, h3, h4, h5 {
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-    
-    h1 {
-        font-size: 2.2rem;
-        background: linear-gradient(90deg, #333333 30%, #6070FF 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: inline-block;
-    }
-    
-    /* Modern Sidebar Styling */
-    .css-1d391kg, .css-12oz5g7 {
-        background-color: #f2f5ff;
-    }
-    
-    /* Modern Chart Styling */
-    .js-plotly-plot .plotly {
-        transition: var(--transition);
-    }
-    
-    .plotly .main-svg {
-        border-radius: 8px;
-    }
-    
-    /* Modern Tooltip Styling */
-    [data-testid="stTooltip"] {
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-md);
-        border: none !important;
-    }
-    
-    /* Modern Metrics Styling */
-    [data-testid="stMetric"] {
-        background: white;
-        padding: 1rem;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-sm);
-    }
-    
-    [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-    """
-
 # Add comprehensive CSS for spacing, visual hierarchy, and layout balance
-base_css = """
+st.markdown("""
 <style>
 /* ========== CORE SPACING SYSTEM ========== */
 /* Creates a consistent 8-point grid system for all spacing */
@@ -1091,18 +936,7 @@ svg text {
     }
 }
 </style>
-"""
-
-# Apply CSS based on mode setting
-if st.session_state.modern_mode:
-    st.markdown(f"""
-    <style>
-    {base_css}
-    {get_modern_css()}
-    </style>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown(base_css, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Define global constants
 sentiment_icons = {
@@ -2625,13 +2459,6 @@ class SmallBusinessDashboard:
 
 # Main application UI
 def main():
-    # Add modern mode toggle in sidebar
-    with st.sidebar:
-        st.markdown("### Dashboard Settings")
-        st.checkbox("Modern UI Mode", value=st.session_state.modern_mode, key="toggle_modern_ui", on_change=toggle_modern_mode)
-        st.markdown("---")
-        st.markdown("<small>Toggle to switch between modern and classic UI</small><br><small>⚠️ Changes will apply after you interact with the dashboard</small>", unsafe_allow_html=True)
-    
     # Add light mode styling
     st.markdown("""
     <style>
@@ -3226,43 +3053,29 @@ def main():
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
                 
-                # Function to render metric card content
-                def render_complexity_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{avg_complexity}/5</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Rated by {len(filtered_data)} respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_complexity_card,
-                    title="Average Complexity Rating",
-                    icon="⭐",
-                    accent_color="#4361EE"
-                )
+                # Direct card using HTML with consistent styling
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{avg_complexity}/5</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Rated by {len(filtered_data)} respondents</div>
+                </div>
+                """, unsafe_allow_html=True)
             except:
-                # Function to render error card content
-                def render_complexity_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_complexity_error_card,
-                    title="Average Complexity Rating",
-                    icon="⭐",
-                    accent_color="#8A8A8A"
-                )
+                # Direct card using HTML for error case with consistent styling
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
+                </div>
+                """, unsafe_allow_html=True)
             
         with col2:
             try:
@@ -3280,43 +3093,29 @@ def main():
                 if len(most_common_timeline) > 30:
                     timeline_font_size = 1.4
                 
-                # Function to render timeline card content
-                def render_timeline_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: {timeline_font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{most_common_timeline}</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{timeline_pct}% of respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_timeline_card,
-                    title="Most Common Timeline",
-                    icon="⏱️",
-                    accent_color="#3A86FF"
-                )
+                # Direct card using HTML with dynamic font sizing
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
+                    <div style="font-size: {timeline_font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{most_common_timeline}</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{timeline_pct}% of respondents</div>
+                </div>
+                """, unsafe_allow_html=True)
             except:
-                # Function to render error card content
-                def render_timeline_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_timeline_error_card,
-                    title="Most Common Timeline",
-                    icon="⏱️",
-                    accent_color="#8A8A8A"
-                )
+                # Direct card using HTML for error case with consistent styling
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
+                </div>
+                """, unsafe_allow_html=True)
             
         with col3:
             try:
@@ -3357,64 +3156,43 @@ def main():
                     if len(cleaned_resource) > 50:
                         font_size = 1.1
                     
-                    # Function to render resource card content
-                    def render_resource_card():
-                        st.markdown(f"""
-                        <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                            <div style="font-size: {font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
-                                    line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{cleaned_resource}</div>
-                            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{percentage}% of resource mentions</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Use enhanced card container with title and icon
-                    card_container(
-                        content_function=render_resource_card,
-                        title="Most Requested Resource",
-                        icon="💡",
-                        accent_color="#F72585"
-                    )
+                    # Direct card using HTML with dynamic font scaling
+                    st.markdown(f"""
+                    <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                        <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                        <div style="font-size: {font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                                  overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
+                                  line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{cleaned_resource}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{percentage}% of resource mentions</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 else:
-                    # Function to render empty resource card
-                    def render_empty_resource_card():
-                        st.markdown(f"""
-                        <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                            <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                    line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">No resource data available</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Use enhanced card container with title and icon
-                    card_container(
-                        content_function=render_empty_resource_card,
-                        title="Most Requested Resource",
-                        icon="💡",
-                        accent_color="#8A8A8A"
-                    )
+                    # Fallback for when no data is available with consistent styling
+                    st.markdown(f"""
+                    <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                                padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                        <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                                  overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                                  line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">No resource data available</div>
+                    </div>
+                    """, unsafe_allow_html=True)
             except Exception as e:
                 logger.error(f"Error displaying most requested resource: {str(e)}")
                 
-                # Function to render error card
-                def render_resource_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Error processing data</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_resource_error_card,
-                    title="Most Requested Resource",
-                    icon="💡",
-                    accent_color="#8A8A8A"
-                )
+                # Direct card using HTML for error case with improved text overflow control
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
+                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Error processing data</div>
+                </div>
+                """, unsafe_allow_html=True)
         
         # Add vertical space before visualizations
         add_vertical_space(3)
