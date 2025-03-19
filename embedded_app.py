@@ -950,11 +950,11 @@ def get_modern_css():
         }}
     }}
     
-    [data-testid="stMetricValue"] {
+    [data-testid="stMetricValue"] {{
         font-size: 1.8rem !important;
         font-weight: 700;
         color: var(--primary-color);
-    }
+    }}
     """
 
 # Add comprehensive CSS for spacing, visual hierarchy, and layout balance
