@@ -10,18 +10,25 @@ import os
 import logging
 import warnings
 import random
+import colorsys
+import time
+from datetime import datetime
 
 # Helper function to properly render HTML content
 def html_content(html_string):
     """Helper function to properly render HTML content"""
     return st.markdown(html_string, unsafe_allow_html=True)
 
-# Chart color constants
+# Define accessible color schemes
 CHART_COLORS = {
     'primary': ['#4361EE', '#4895EF', '#4CC9F0', '#3F37C9', '#3A0CA3', '#7209B7'],
     'secondary': ['#F72585', '#B5179E', '#7209B7', '#560BAD', '#480CA8', '#3A0CA3'],
     'categorical': ['#4361EE', '#3A86FF', '#4CC9F0', '#FF9F1C', '#FF9800', '#F72585'],
-    'sequential': ['#caf0f8', '#90e0ef', '#48cae4', '#00b4d8', '#0096c7', '#0077b6', '#023e8a']
+    'sequential': ['#caf0f8', '#90e0ef', '#48cae4', '#00b4d8', '#0096c7', '#0077b6', '#023e8a'],
+    # Add colorblind-friendly palette
+    'colorblind': ['#0072B2', '#E69F00', '#56B4E9', '#009E73', '#F0E442', '#D55E00', '#CC79A7', '#999999'],
+    # Dark mode palette
+    'dark_mode': ['#7EB6FF', '#B5FFFF', '#94FBAB', '#FFDD94', '#FFB7D5', '#E8CFF8', '#DDDDDD']
 }
 
 # Set page configuration with proper spacing
@@ -44,7 +51,7 @@ def add_vertical_space(height=1):
     """Add vertical space with a multiplier of 0.5rem"""
     st.markdown(f"<div style='height:{height*0.5}rem'></div>", unsafe_allow_html=True)
 
-def metric_card(title, value, subtitle, icon=None, accent_color=None):
+def metric_card(title, value, subtitle, icon=None, accent_color=None, loading=False):
     """Creates a complete metric card with value and subtitle
 
     Args:
@@ -53,54 +60,208 @@ def metric_card(title, value, subtitle, icon=None, accent_color=None):
         subtitle: Subtitle text for context
         icon: Optional icon for the card title
         accent_color: Optional accent color for the card (hex code)
+        loading: Whether to show a loading state (default: False)
     """
-    # Check if modern mode is enabled
-    is_modern = 'modern_mode' in st.session_state and st.session_state.modern_mode
+    # Get the current theme settings
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    is_modern = theme['modern']
+    is_dark = theme['dark']
+    
+    # Font size adjustment based on length of value
+    value_length = len(str(value))
+    font_size = "1.9rem" if value_length < 15 else ("1.6rem" if value_length < 25 else "1.4rem")
+    
+    # Icon and accent handling
+    icon_prefix = f"{icon} " if icon else ""
+    if not accent_color:
+        accent_color = "#5B70FF" if is_dark else "#4361EE"
+    
+    # Loading state UI
+    if loading:
+        loading_class = "loading-skeleton"
+        loading_style = "animation: loading 1.5s infinite;"
+    else:
+        loading_class = ""
+        loading_style = ""
+    
+    # Create CSS classes for animation control
+    transition = "var(--transition)"
     
     # For modern cards
     if is_modern:
-        border_style = f"border-left: 4px solid {accent_color};" if accent_color else ""
-        icon_prefix = f"{icon} " if icon else ""
+        # Colors adjusted for dark/light mode
+        if is_dark:
+            bg_color = "var(--card-background)"
+            text_color = "var(--text-color)"
+            subtitle_color = "var(--muted-text-color)"
+            border_style = f"border-left: 4px solid {accent_color}; border-top: var(--card-border); border-right: var(--card-border); border-bottom: var(--card-border);"
+        else:
+            bg_color = "white"
+            text_color = "#333"
+            subtitle_color = "#666"
+            border_style = f"border-left: 4px solid {accent_color};"
         
         st.markdown(f"""
-        <div style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.08);
-                    padding: 20px; margin-bottom: 20px; height: 170px; {border_style}">
-            <h3 style="margin-top: 0; font-weight: 600; font-size: 1.1rem; margin-bottom: 15px; color: #333;">{icon_prefix}{title}</h3>
+        <div class="{loading_class}" style="background-color: {bg_color}; border-radius: var(--border-radius); 
+                    box-shadow: var(--shadow-md); {loading_style}
+                    padding: 20px; margin-bottom: 20px; height: 170px; {border_style} transition: {transition};"
+                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='var(--shadow-lg)';" 
+                    onmouseout="this.style.transform=''; this.style.boxShadow='var(--shadow-md)';">
+            <h3 style="margin-top: 0; font-weight: 600; font-size: 1.1rem; margin-bottom: 15px; color: {text_color};">{icon_prefix}{title}</h3>
             <div style="display: flex; flex-direction: column; justify-content: center; height: 100px;">
-                <div style="font-size: 1.9rem; font-weight: bold; color: {accent_color if accent_color else '#4361EE'}; 
+                <div style="font-size: {font_size}; font-weight: bold; color: {accent_color}; 
                         margin-bottom: 10px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; 
                         text-align: center; word-wrap: break-word;">{value}</div>
-                <div style="color: #666; font-size: 0.9rem; text-align: center;">{subtitle}</div>
+                <div style="color: {subtitle_color}; font-size: 0.9rem; text-align: center;">{subtitle}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
     else:
-        # Classic card
+        # Classic card - simpler styling but still respecting dark mode if enabled
+        if is_dark:
+            bg_color = "#2A2A2A"
+            title_color = "#CCCCCC"
+            value_color = "#90A4FF"
+            subtitle_color = "#999999"
+        else:
+            bg_color = "white"
+            title_color = "#555"
+            value_color = "#4361EE"
+            subtitle_color = "#666"
+            
         st.markdown(f"""
-        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                    padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
-            <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">{title}</div>
-            <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+        <div class="{loading_class}" style="background-color: {bg_color}; border-radius: 8px; 
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1); {loading_style}
+                    padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; 
+                    display: flex; flex-direction: column; transition: {transition};"
+                    onmouseover="this.style.transform='translateY(-2px)';" 
+                    onmouseout="this.style.transform='';">
+            <div style="font-weight: bold; color: {title_color}; font-size: 1rem; margin-bottom: 10px;">{title}</div>
+            <div style="font-size: {font_size}; font-weight: bold; color: {value_color}; margin-bottom: 8px; flex-grow: 1;
                     overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
                     line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{value}</div>
-            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{subtitle}</div>
+            <div style="color: {subtitle_color}; font-size: 0.9rem; margin-top: auto; white-space: nowrap; 
+                     overflow: hidden; text-overflow: ellipsis;">{subtitle}</div>
         </div>
         """, unsafe_allow_html=True)
 
-# Smart Device Detection
+# Enhanced mobile device detection and optimizations
 def is_likely_mobile():
     """Detect if the current device is likely a mobile device
     
-    Uses JavaScript to detect screen width and stores the result in query params
+    Uses JavaScript to detect screen width, user agent, and stores the result in query params
+    Also adds touch event handlers for better mobile experience
     """
-    # Use JavaScript to detect screen size
+    # Use enhanced JavaScript to detect mobile devices more accurately
     device_script = """
     <script>
-        if (window.innerWidth < 768) {
+        function detectMobile() {
+            // Check screen width
+            const isMobileWidth = window.innerWidth < 768;
+            
+            // Check for mobile user agent
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            
+            // Check for touch capability
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // Combine checks
+            const isMobile = isMobileWidth || (isMobileUA && isTouchDevice);
+            
+            // Set query params if mobile detected
             const urlParams = new URLSearchParams(window.location.search);
-            if (!urlParams.has('mobile')) {
-                window.parent.postMessage({type: 'streamlit:setQueryParam', queryParams: {'mobile': 'true'}}, '*');
+            if (isMobile && !urlParams.has('mobile')) {
+                window.parent.postMessage({
+                    type: 'streamlit:setQueryParam', 
+                    queryParams: {'mobile': 'true'}
+                }, '*');
             }
+            
+            // Return device info for potential use
+            return {
+                isMobile: isMobile,
+                screenWidth: window.innerWidth,
+                screenHeight: window.innerHeight,
+                pixelRatio: window.devicePixelRatio || 1,
+                isTouch: isTouchDevice
+            };
+        }
+        
+        // Add enhanced touch handlers for swipe gestures on mobile
+        function setupSwipeHandlers() {
+            if (!('ontouchstart' in window)) return;
+            
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            // Clean up any existing listeners
+            document.removeEventListener('touchstart', handleTouchStart);
+            document.removeEventListener('touchend', handleTouchEnd);
+            
+            // Set up event handlers
+            document.addEventListener('touchstart', handleTouchStart, false);
+            document.addEventListener('touchend', handleTouchEnd, false);
+            
+            function handleTouchStart(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }
+            
+            function handleTouchEnd(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipeGesture();
+            }
+            
+            function handleSwipeGesture() {
+                // Calculate distance and direction
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // Only register significant horizontal swipes (stronger than vertical)
+                if (Math.abs(deltaX) > 100 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // Find all tabbed elements
+                    const tabs = document.querySelectorAll('[data-baseweb="tab"]');
+                    if (tabs.length > 0) {
+                        // Get the current active tab
+                        const activeTab = document.querySelector('[data-baseweb="tab"][aria-selected="true"]');
+                        if (activeTab) {
+                            const activeIndex = Array.from(tabs).indexOf(activeTab);
+                            if (activeIndex !== -1) {
+                                // Determine which tab to select based on swipe direction
+                                let newIndex = deltaX < 0 ? activeIndex + 1 : activeIndex - 1;
+                                
+                                // Ensure we stay within bounds
+                                if (newIndex >= 0 && newIndex < tabs.length) {
+                                    // Trigger a click on the new tab
+                                    tabs[newIndex].click();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Call our detection functions
+        const deviceInfo = detectMobile();
+        setupSwipeHandlers();
+        
+        // Add a class to the body for mobile-specific CSS targeting
+        if (deviceInfo.isMobile) {
+            document.body.classList.add('mobile-device');
+        }
+        
+        // Add accessibility helper for reduced motion if applicable
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+            document.body.classList.add('prefers-reduced-motion');
+            // Set a cookie to remember this preference
+            document.cookie = "prefersReducedMotion=true; path=/; max-age=31536000";
         }
     </script>
     """
@@ -110,23 +271,89 @@ def is_likely_mobile():
     mobile_param = st.query_params.get('mobile', False)
     return mobile_param == 'true'
 
-# Function to handle device-specific optimizations
+# Enhanced function to handle device-specific optimizations
 def optimize_for_device():
-    """Get device-specific optimization parameters
+    """Get comprehensive device-specific optimization parameters
     
-    Returns a dictionary with device-specific parameters like column count,
-    chart height, and other parameters
+    Returns a dictionary with device-specific parameters including font sizes,
+    touch targets, animation behavior, and layout options
     """
     is_mobile = is_likely_mobile()
     
-    return {
+    # Initialize theme preferences to access motion settings
+    initialize_theme_preferences()
+    reduce_motion = st.session_state.get('reduce_motion', False)
+    
+    # Get font size multiplier if it exists
+    font_multiplier = st.session_state.get('font_size_multiplier', 1.0)
+    
+    # Define device-specific parameters
+    base_config = {
         'is_mobile': is_mobile,
         'column_count': 1 if is_mobile else 2,
         'chart_height': 350 if is_mobile else 500,
-        'font_size': 10 if is_mobile else 14,
-        'title_size': 14 if is_mobile else 18,
-        'points_limit': 20 if is_mobile else 100  # For data simplification
+        'font_size': int(10 * font_multiplier) if is_mobile else int(14 * font_multiplier),
+        'title_size': int(14 * font_multiplier) if is_mobile else int(18 * font_multiplier),
+        'points_limit': 20 if is_mobile else 100,  # For data simplification
+        'touch_target_min': 44 if is_mobile else 32,  # Minimum touch target size in pixels
+        'animation_duration': 0 if reduce_motion else (300 if is_mobile else 500),  # Animation duration in ms
+        'lazy_load': is_mobile,  # Whether to lazy-load content
+        'compress_images': is_mobile,  # Whether to compress images
+        'cache_results': is_mobile,  # Whether to cache computational results
     }
+    
+    # Add responsive breakpoints for more granular control
+    screen_width = st.session_state.get('screen_width', 1200)  # Default to desktop if unknown
+    
+    if is_mobile:
+        if screen_width < 380:  # Extra small mobile
+            base_config.update({
+                'card_columns': 1,
+                'font_size': int(9 * font_multiplier),
+                'chart_height': 300,
+            })
+        else:  # Regular mobile
+            base_config.update({
+                'card_columns': 1,
+                'chart_height': 350,
+            })
+    else:
+        if screen_width < 992:  # Tablet
+            base_config.update({
+                'column_count': 2,
+                'card_columns': 2,
+                'chart_height': 400,
+            })
+        else:  # Desktop
+            base_config.update({
+                'column_count': 3,
+                'card_columns': 3,
+                'chart_height': 500,
+            })
+    
+    return base_config
+    
+# Add swipe gesture support function
+def enable_swipe_gestures():
+    """Enable swipe gestures for mobile navigation
+    
+    Adds JavaScript to handle horizontal swipe gestures for tab navigation
+    """
+    # Only needed on mobile
+    if not is_likely_mobile():
+        return
+        
+    swipe_script = """
+    <script>
+    // This script is automatically called by the device detection code
+    // It's included as a reference and backup
+    if (!window.hasSetupSwipeHandlers) {
+        setupSwipeHandlers();
+        window.hasSetupSwipeHandlers = true;
+    }
+    </script>
+    """
+    st.markdown(swipe_script, unsafe_allow_html=True)
 
 # Function to simplify data for mobile
 def simplify_data(data, limit=20):
@@ -172,51 +399,172 @@ def display_content_by_priority(content_blocks, is_mobile=None):
             elif 'content' in block:
                 st.markdown(block['content'], unsafe_allow_html=True)
 
-# Lazy load charts on mobile
-def lazy_load_chart(chart_function, chart_id, data=None, button_text="Load Chart"):
-    """Lazy load charts on mobile devices to improve performance
+# Enhanced loading states and lazy loading
+def loading_placeholder(height=300, text="Loading chart...", show_spinner=True):
+    """Display a loading placeholder for charts or content
+    
+    Creates a visually appealing loading state with optional spinner
+    """
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    is_dark = theme['dark']
+    
+    bg_color = "var(--card-background)"
+    spinner_color = "var(--primary-color)"
+    text_color = "var(--text-color)"
+    
+    # Use CSS loading animation
+    st.markdown(f"""
+    <div style="height: {height}px; background-color: {bg_color}; 
+               border-radius: var(--border-radius); display: flex; 
+               align-items: center; justify-content: center; 
+               flex-direction: column; padding: 20px;
+               box-shadow: var(--shadow-sm);">
+        {"<div class='loading-spinner'></div>" if show_spinner else ""}
+        <p style="color: {text_color}; margin-top: 15px;">{text}</p>
+    </div>
+    
+    <style>
+    .loading-spinner {{
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: {spinner_color};
+        animation: spin 1s ease-in-out infinite;
+    }}
+    
+    @keyframes spin {{
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+# Enhanced lazy loading with smooth transitions
+def lazy_load_chart(chart_function, chart_id, data=None, button_text="Load Chart", height=300):
+    """Lazy load charts with enhanced transition animations
     
     Args:
         chart_function: Function that renders the chart
         chart_id: Unique identifier for this chart
         data: Data to pass to the chart function
         button_text: Text for the load button
+        height: Height of the placeholder
     """
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    is_mobile = is_likely_mobile()
+    reduce_motion = theme['reduce_motion']
+    
     # Initialize session state for this chart if not exists
     if f'load_{chart_id}' not in st.session_state:
-        st.session_state[f'load_{chart_id}'] = not is_likely_mobile()
+        st.session_state[f'load_{chart_id}'] = not is_mobile
+    
+    if f'loading_{chart_id}' not in st.session_state:
+        st.session_state[f'loading_{chart_id}'] = False
     
     # If already loaded or not mobile, render the chart
     if st.session_state[f'load_{chart_id}']:
+        if st.session_state[f'loading_{chart_id}']:
+            # Show loading placeholder briefly for better UX
+            loading_placeholder(height=height, text=f"Loading {chart_id}...")
+            # In a real app, we'd use a timer to change this state
+            # For demo, we'll trigger rerun automatically
+            st.session_state[f'loading_{chart_id}'] = False
+            time.sleep(0.5 if not reduce_motion else 0.1)  # Brief delay for animation
         return chart_function(data) if data is not None else chart_function()
     else:
-        # Show placeholder with load button
+        # Show enhanced placeholder with load button
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown(f"**Chart: {chart_id}** (Load to view)")
+            st.markdown(f"**Chart: {chart_id}**")
         with col2:
             if st.button(button_text, key=f"btn_{chart_id}"):
                 st.session_state[f'load_{chart_id}'] = True
-                # Request rerun to render the chart
+                st.session_state[f'loading_{chart_id}'] = True
+                # Request rerun to show loading state
                 st.experimental_rerun()
+        
+        # Show optimized placeholder
+        loading_placeholder(height=height, text="Click to load chart", show_spinner=False)
 
 # Enhanced helper function for mobile-friendly chart rendering
-def render_mobile_chart(fig, data=None, use_container_width=True):
+def render_mobile_chart(fig, data=None, use_container_width=True, with_animation=True):
     """Render a plotly chart with enhanced mobile-friendly configuration
     
     This function applies comprehensive mobile optimizations to charts
+    and supports dark mode and accessibility features
+    
+    Args:
+        fig: Plotly figure object
+        data: Optional data to simplify for mobile
+        use_container_width: Whether to use container width
+        with_animation: Whether to enable animations (respects reduce_motion setting)
     """
+    # Get device and theme settings
     device = optimize_for_device()
     is_mobile = device['is_mobile']
     
-    # Optionally simplify data for mobile
+    # Get current theme settings
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    is_dark = theme['dark']
+    reduce_motion = theme['reduce_motion']
+    is_colorblind = theme['colorblind']
+    is_high_contrast = theme['high_contrast']
+    
+    # Simplify data for mobile if needed
     if data is not None and is_mobile and hasattr(data, '__len__') and len(data) > device['points_limit']:
-        # Would need to recreate the figure with simplified data
-        # This is a placeholder - actual implementation depends on chart type
+        # This would be implemented based on chart type
         pass
     
-    # Apply mobile-friendly settings with device-specific values
+    # Determine color scheme based on theme
+    if is_dark:
+        bg_color = "#121212"
+        paper_bg = "#1E1E1E"
+        grid_color = "#333333"
+        text_color = "#E6E6E6"
+        muted_text = "#999999"
+    else:
+        bg_color = "#f9f9fc"
+        paper_bg = "#ffffff"
+        grid_color = "#e0e0e0"
+        text_color = "#333333"
+        muted_text = "#777777"
+    
+    # Set colors for plot based on theme
+    if is_colorblind:
+        # Use colorblind-friendly palette
+        colorway = CHART_COLORS['colorblind']
+    elif is_dark:
+        # Use dark mode palette
+        colorway = CHART_COLORS['dark_mode']
+    else:
+        # Use default palette
+        colorway = CHART_COLORS['primary']
+    
+    # Override for high contrast
+    if is_high_contrast:
+        if is_dark:
+            colorway = ['#FFFFFF', '#FFFF00', '#00FFFF', '#FF00FF', '#00FF00']
+            grid_color = "#555555"
+        else:
+            colorway = ['#000000', '#0000FF', '#FF0000', '#008000', '#800080']
+            grid_color = "#AAAAAA"
+    
+    # Handle animation settings
+    animation_duration = 0 if reduce_motion else 500
+    easing = 'cubic-in-out'
+    
+    # Apply adaptive settings with device-specific values
     fig.update_layout(
+        # Theme and color settings
+        template="plotly_dark" if is_dark else "plotly_white",
+        colorway=colorway,
+        plot_bgcolor=bg_color,
+        paper_bgcolor=paper_bg,
+        
         # Adjust height based on device
         height=device['chart_height'],
         
@@ -226,12 +574,13 @@ def render_mobile_chart(fig, data=None, use_container_width=True):
                    b=60 if is_mobile else 40, 
                    l=40),
         
-        # Enhanced hoverlabels for touch
+        # Enhanced hoverlabels for touch and theme
         hoverlabel=dict(
-            bgcolor="white",
+            bgcolor=paper_bg,
+            bordercolor="rgba(255,255,255,0.2)" if is_dark else "rgba(0,0,0,0.1)",
             font_size=12,
             font_family="Arial",
-            bordercolor="#4361EE" if is_mobile else None,  # More visible on mobile
+            font_color=text_color,
             namelength=-1  # Show full field names
         ),
         
@@ -242,25 +591,47 @@ def render_mobile_chart(fig, data=None, use_container_width=True):
             y=1.02 if is_mobile else None,
             xanchor="right" if is_mobile else "auto",
             x=1 if is_mobile else None,
-            font=dict(size=device['font_size'])
+            font=dict(size=device['font_size'], color=text_color),
+            bgcolor="rgba(30,30,30,0.7)" if is_dark else "rgba(255,255,255,0.7)",
+            bordercolor="rgba(255,255,255,0.2)" if is_dark else "rgba(0,0,0,0.1)"
         ),
         
         # Mobile-friendly title positioning
         title=dict(
             y=0.95,  # Position title lower to avoid toolbar
             x=0.5,
-            font=dict(size=device['title_size'], color='#000000', family='Arial, sans-serif')
+            font=dict(
+                size=device['title_size'], 
+                color=text_color, 
+                family='Arial, sans-serif'
+            )
         ),
         
-        # Ensure fonts are readable on mobile
+        # Ensure fonts are readable based on theme
         font=dict(
             size=device['font_size'],
-            color='#000000',
+            color=text_color,
             family='Arial, sans-serif'
+        ),
+        
+        # Animation settings respecting accessibility preferences
+        transition_duration=animation_duration,
+        transition_easing=easing,
+        
+        # Improved grid and axis styling
+        xaxis=dict(
+            gridcolor=grid_color,
+            zerolinecolor=grid_color,
+            tickfont=dict(color=muted_text)
+        ),
+        yaxis=dict(
+            gridcolor=grid_color,
+            zerolinecolor=grid_color,
+            tickfont=dict(color=muted_text)
         )
     )
     
-    # Enhanced config options for better mobile experience
+    # Enhanced config options for better experience
     config = {
         'scrollZoom': False,                      # Disable scroll zooming on mobile
         'displayModeBar': 'hover',                # Show toolbar only on hover
@@ -270,133 +641,473 @@ def render_mobile_chart(fig, data=None, use_container_width=True):
         # Remove complex interactions on mobile that are hard with touch
         'modeBarButtonsToRemove': [
             'select2d', 'lasso2d', 'autoScale2d'
-        ] if is_mobile else []
+        ] if is_mobile else [],
+        # Disable animations if reduce_motion is enabled
+        'staticPlot': reduce_motion and is_mobile,  # Complete disable of interactivity for reduce_motion on mobile
     }
+    
+    # For improved accessibility with high contrast mode
+    if is_high_contrast:
+        # Update line width for better visibility
+        if hasattr(fig, 'data'):
+            for trace in fig.data:
+                if hasattr(trace, 'line') and trace.line:
+                    if hasattr(trace.line, 'width'):
+                        trace.line.width = 3  # Thicker lines for visibility
+    
+    # Add a subtle loading animation before rendering final chart
+    if with_animation and not reduce_motion:
+        loading_placeholder(height=device['chart_height'], text="Preparing visualization...")
+        time.sleep(0.3)  # Brief delay for visual feedback
     
     # Render the chart with the improved config
     return st.plotly_chart(fig, use_container_width=use_container_width, config=config)
 
-# Function to toggle modern mode
-def toggle_modern_mode():
-    # Initialize if it doesn't exist
+# Theme management functions
+def initialize_theme_preferences():
+    """Initialize theme preferences in session state"""
     if 'modern_mode' not in st.session_state:
         st.session_state.modern_mode = True
-    else:
-        # Toggle the current state
-        st.session_state.modern_mode = not st.session_state.modern_mode
-
-# Modern CSS styles with enhanced visual appeal
-def get_modern_css():
-    return """
-    /* Modern UI Variables */
-    :root {
-        --primary-color: #4361EE;
-        --primary-light: #4895EF;
-        --accent-color: #F72585;
-        --text-color: #333333;
-        --background-color: #f9f9fc;
-        --card-background: #ffffff;
-        --border-radius: 12px;
-        --shadow-sm: 0 2px 8px rgba(67, 97, 238, 0.05);
-        --shadow-md: 0 4px 12px rgba(67, 97, 238, 0.08);
-        --shadow-lg: 0 8px 24px rgba(67, 97, 238, 0.12);
-        --transition: all 0.3s ease;
-        --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    if 'dark_mode' not in st.session_state:
+        st.session_state.dark_mode = False
+    if 'high_contrast' not in st.session_state:
+        st.session_state.high_contrast = False
+    if 'colorblind_mode' not in st.session_state:
+        st.session_state.colorblind_mode = False
+    if 'reduce_motion' not in st.session_state:
+        st.session_state.reduce_motion = False
+    if 'last_interaction' not in st.session_state:
+        st.session_state.last_interaction = time.time()
+    if 'theme_settings_open' not in st.session_state:
+        st.session_state.theme_settings_open = False
+        
+def render_theme_settings_panel():
+    """Render a theme settings panel for the app
     
-    /* Modern Body Styling */
-    body {
+    This creates an expandable panel with theme toggles
+    """
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    
+    # Determine icon based on current theme
+    theme_icon = "🌙" if theme['dark'] else "☀️"
+    modern_icon = "✨" if theme['modern'] else "📊"
+    
+    # Create theme settings panel
+    with st.sidebar:
+        st.markdown("### Display Settings")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button(f"{modern_icon} UI Style", help="Toggle between modern and classic UI"):
+                toggle_modern_mode()
+                st.experimental_rerun()
+        with col2:
+            if st.button(f"{theme_icon} Theme", help="Toggle between light and dark mode"):
+                toggle_dark_mode()
+                st.experimental_rerun()
+        
+        # Expandable accessibility section
+        if st.checkbox("Accessibility Options", value=st.session_state.theme_settings_open):
+            st.session_state.theme_settings_open = True
+            
+            # High contrast mode
+            if st.checkbox("High Contrast Mode", value=theme['high_contrast'], 
+                          help="Increases contrast for better readability"):
+                toggle_high_contrast()
+                st.experimental_rerun()
+            
+            # Colorblind friendly mode
+            if st.checkbox("Colorblind-friendly", value=theme['colorblind'], 
+                          help="Uses a colorblind-friendly color palette"):
+                toggle_colorblind_mode()
+                st.experimental_rerun()
+            
+            # Reduced motion
+            if st.checkbox("Reduce Motion", value=theme['reduce_motion'], 
+                          help="Minimizes animations for reduced motion sensitivity"):
+                toggle_reduce_motion()
+                st.experimental_rerun()
+                
+            # Font size control
+            if 'font_size_multiplier' not in st.session_state:
+                st.session_state.font_size_multiplier = 1.0
+                
+            new_size = st.select_slider(
+                "Text Size", 
+                options=[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
+                value=st.session_state.font_size_multiplier,
+                format_func=lambda x: {0.8: "Smaller", 0.9: "Small", 1.0: "Default", 
+                                     1.1: "Large", 1.2: "Larger", 1.3: "X-Large", 
+                                     1.4: "XX-Large"}[x],
+                help="Adjust text size throughout the application"
+            )
+            
+            if new_size != st.session_state.font_size_multiplier:
+                st.session_state.font_size_multiplier = new_size
+                st.experimental_rerun()
+                
+            st.markdown("---")
+        else:
+            st.session_state.theme_settings_open = False
+
+def toggle_modern_mode():
+    """Toggle between modern and classic UI"""
+    initialize_theme_preferences()
+    st.session_state.modern_mode = not st.session_state.modern_mode
+    st.session_state.last_interaction = time.time()
+
+def toggle_dark_mode():
+    """Toggle between dark and light mode"""
+    initialize_theme_preferences()
+    st.session_state.dark_mode = not st.session_state.dark_mode
+    st.session_state.last_interaction = time.time()
+
+def toggle_high_contrast():
+    """Toggle high contrast mode for accessibility"""
+    initialize_theme_preferences()
+    st.session_state.high_contrast = not st.session_state.high_contrast
+    st.session_state.last_interaction = time.time()
+
+def toggle_colorblind_mode():
+    """Toggle colorblind-friendly mode"""
+    initialize_theme_preferences()
+    st.session_state.colorblind_mode = not st.session_state.colorblind_mode
+    st.session_state.last_interaction = time.time()
+
+def toggle_reduce_motion():
+    """Toggle reduced motion for accessibility"""
+    initialize_theme_preferences()
+    st.session_state.reduce_motion = not st.session_state.reduce_motion
+    st.session_state.last_interaction = time.time()
+
+def get_current_theme():
+    """Get current theme settings as a dictionary"""
+    initialize_theme_preferences()
+    return {
+        'modern': st.session_state.modern_mode,
+        'dark': st.session_state.dark_mode,
+        'high_contrast': st.session_state.high_contrast,
+        'colorblind': st.session_state.colorblind_mode,
+        'reduce_motion': st.session_state.reduce_motion
+    }
+
+# Get CSS based on current theme settings
+def get_modern_css():
+    initialize_theme_preferences()
+    theme = get_current_theme()
+    
+    # Base variables depending on dark/light mode
+    if theme['dark']:
+        base_vars = """
+        /* Dark Mode Variables */
+        :root {
+            --primary-color: #5B70FF;
+            --primary-light: #738AFF;
+            --accent-color: #FF7597;
+            --text-color: #E6E6E6;
+            --muted-text-color: #AAAAAA;
+            --background-color: #121212;
+            --card-background: #1E1E1E;
+            --card-border: 1px solid #333333;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+            --chart-grid: #333333;
+            --sidebar-bg: #1A1A1A;
+        }
+        """
+    else:
+        base_vars = """
+        /* Light Mode Variables */
+        :root {
+            --primary-color: #4361EE;
+            --primary-light: #4895EF;
+            --accent-color: #F72585;
+            --text-color: #333333;
+            --muted-text-color: #666666;
+            --background-color: #f9f9fc;
+            --card-background: #ffffff;
+            --card-border: none;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(67, 97, 238, 0.05);
+            --shadow-md: 0 4px 12px rgba(67, 97, 238, 0.08);
+            --shadow-lg: 0 8px 24px rgba(67, 97, 238, 0.12);
+            --chart-grid: #e0e0e0;
+            --sidebar-bg: #f2f5ff;
+        }
+        """
+    
+    # Adjust for high contrast if enabled
+    if theme['high_contrast']:
+        high_contrast_vars = """
+        /* High Contrast Overrides */
+        :root {
+            --primary-color: """ + ('#FFFFFF' if theme['dark'] else '#000000') + """;
+            --primary-light: """ + ('#E0E0E0' if theme['dark'] else '#333333') + """;
+            --accent-color: """ + ('#FFFF00' if theme['dark'] else '#0000FF') + """;
+            --text-color: """ + ('#FFFFFF' if theme['dark'] else '#000000') + """;
+            --muted-text-color: """ + ('#CCCCCC' if theme['dark'] else '#333333') + """;
+            --card-border: 2px solid """ + ('#FFFFFF' if theme['dark'] else '#000000') + """;
+        }
+        """
+    else:
+        high_contrast_vars = ""
+    
+    # Determine transition settings based on reduce_motion preference
+    transition = "all 0.3s ease" if not theme['reduce_motion'] else "none"
+    
+    return base_vars + high_contrast_vars + f"""
+    /* Shared Variables */
+    :root {{
+        --transition: {transition};
+        --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }}
+    
+    /* Body Styling */
+    body {{
         background-color: var(--background-color);
         color: var(--text-color);
         font-family: var(--font-family);
-    }
+    }}
     
-    /* Modern Card Styling */
-    .card {
+    /* Loading Animation */
+    @keyframes pulse {{
+        0% {{ opacity: 0.6; }}
+        50% {{ opacity: 0.8; }}
+        100% {{ opacity: 0.6; }}
+    }}
+    
+    .loading {{
+        animation: pulse 1.5s infinite;
+        background-color: #f0f0f0;
+        border-radius: var(--border-radius);
+    }}
+    
+    /* Tooltip Animation */
+    @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(10px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    
+    /* Enhanced Card Styling */
+    .card {{
         background: var(--card-background);
         border-radius: var(--border-radius);
         padding: 1.5rem;
         box-shadow: var(--shadow-md);
         transition: var(--transition);
-        border: none !important;
+        border: var(--card-border);
         margin-bottom: 1.5rem;
-    }
+        position: relative;
+        overflow: hidden;
+    }}
     
-    .card:hover {
+    .card:hover {{
         box-shadow: var(--shadow-lg);
         transform: translateY(-2px);
-    }
+    }}
+
+    .card::after {{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        opacity: 0;
+        transition: var(--transition);
+    }}
+
+    .card:hover::after {{
+        opacity: 1;
+    }}
     
-    /* Modern Button Styling */
-    .stButton > button {
+    /* Button Styling with Hover Effects */
+    .stButton > button {{
         border-radius: 8px;
         padding: 0.5rem 1rem;
         background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
         color: white;
         border: none;
         transition: var(--transition);
-    }
+        position: relative;
+        overflow: hidden;
+    }}
     
-    .stButton > button:hover {
+    .stButton > button:hover {{
         box-shadow: var(--shadow-md);
         transform: translateY(-1px);
-    }
+    }}
     
-    /* Modern Tab Styling */
-    .stTabs [data-baseweb="tab"] {
+    .stButton > button::after {{
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+        transform: translate(-50%, -50%) scale(0);
+        transition: var(--transition);
+    }}
+    
+    .stButton > button:hover::after {{
+        transform: translate(-50%, -50%) scale(1);
+    }}
+    
+    /* Tab Navigation with Animations */
+    .stTabs [data-baseweb="tab"] {{
         padding: 1rem 1.5rem;
         font-weight: 500;
-    }
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+    }}
     
-    .stTabs [data-baseweb="tab-list"] {
+    .stTabs [data-baseweb="tab"]::after {{
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--primary-color);
+        transform: scaleX(0);
+        transition: var(--transition);
+        transform-origin: center;
+    }}
+    
+    .stTabs [data-baseweb="tab"]:hover::after {{
+        transform: scaleX(0.8);
+    }}
+    
+    .stTabs [data-baseweb="tab-list"] {{
         gap: 1rem;
         background-color: transparent;
-    }
+    }}
     
-    .stTabs [data-baseweb="tab-highlight"] {
+    .stTabs [data-baseweb="tab-highlight"] {{
         background-color: var(--primary-color);
-    }
+        transition: var(--transition);
+    }}
     
-    /* Modern Header Styling */
-    h1, h2, h3, h4, h5 {
+    /* Header Styling */
+    h1, h2, h3, h4, h5 {{
         font-weight: 600;
-        color: #1a1a1a;
-    }
+        color: var(--text-color);
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }}
     
-    h1 {
+    h1 {{
         font-size: 2.2rem;
-        background: linear-gradient(90deg, #333333 30%, #6070FF 100%);
+        background: linear-gradient(90deg, var(--text-color) 30%, var(--primary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         display: inline-block;
-    }
+    }}
     
-    /* Modern Sidebar Styling */
-    .css-1d391kg, .css-12oz5g7 {
-        background-color: #f2f5ff;
-    }
+    /* Mobile Section Headers */
+    @media (max-width: 768px) {{
+        h1 {{
+            font-size: 1.8rem;
+        }}
+        h2 {{
+            font-size: 1.4rem;
+        }}
+    }}
     
-    /* Modern Chart Styling */
-    .js-plotly-plot .plotly {
+    /* Sidebar Styling */
+    .css-1d391kg, .css-12oz5g7 {{
+        background-color: var(--sidebar-bg);
+    }}
+    
+    /* Chart Styling with Animations */
+    .js-plotly-plot .plotly {{
         transition: var(--transition);
-    }
+    }}
     
-    .plotly .main-svg {
+    .plotly .main-svg {{
         border-radius: 8px;
-    }
+    }}
     
-    /* Modern Tooltip Styling */
-    [data-testid="stTooltip"] {
+    /* Tooltip Enhancement */
+    [data-testid="stTooltip"] {{
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-md);
         border: none !important;
-    }
+        animation: fadeIn 0.2s ease-out;
+    }}
     
-    /* Modern Metrics Styling */
-    [data-testid="stMetric"] {
-        background: white;
+    /* Metrics Card Styling */
+    [data-testid="stMetric"] {{
+        background: var(--card-background);
         padding: 1rem;
         border-radius: var(--border-radius);
+        border: var(--card-border);
+        transition: var(--transition);
+    }}
+    
+    [data-testid="stMetric"]:hover {{
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }}
+    
+    /* Dropdown menu styling */
+    .stSelectbox label {{
+        color: var(--text-color) !important;
+    }}
+    
+    /* Data table styling */
+    .stDataFrame {{
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }}
+    
+    .stDataFrame th {{
+        background-color: var(--primary-color);
+        color: white;
+    }}
+    
+    /* Loading states for content */
+    .loading-skeleton {{
+        background: linear-gradient(90deg, var(--card-background), var(--background-color), var(--card-background));
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: var(--border-radius);
+        height: 20px;
+        margin-bottom: 8px;
+    }}
+    
+    @keyframes loading {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
+    }}
+    
+    /* Mobile touch targets */
+    @media (max-width: 768px) {{
+        .stButton > button {{
+            min-height: 44px;
+            width: 100%;
+        }}
+        
+        select, [data-baseweb="select"] {{
+            min-height: 44px;
+        }}
+        
+        .stTabs [data-baseweb="tab"] {{
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+    }}
         box-shadow: var(--shadow-sm);
     }
     
