@@ -399,172 +399,51 @@ def display_content_by_priority(content_blocks, is_mobile=None):
             elif 'content' in block:
                 st.markdown(block['content'], unsafe_allow_html=True)
 
-# Enhanced loading states and lazy loading
-def loading_placeholder(height=300, text="Loading chart...", show_spinner=True):
-    """Display a loading placeholder for charts or content
-    
-    Creates a visually appealing loading state with optional spinner
-    """
-    initialize_theme_preferences()
-    theme = get_current_theme()
-    is_dark = theme['dark']
-    
-    bg_color = "var(--card-background)"
-    spinner_color = "var(--primary-color)"
-    text_color = "var(--text-color)"
-    
-    # Use CSS loading animation
-    st.markdown(f"""
-    <div style="height: {height}px; background-color: {bg_color}; 
-               border-radius: var(--border-radius); display: flex; 
-               align-items: center; justify-content: center; 
-               flex-direction: column; padding: 20px;
-               box-shadow: var(--shadow-sm);">
-        {"<div class='loading-spinner'></div>" if show_spinner else ""}
-        <p style="color: {text_color}; margin-top: 15px;">{text}</p>
-    </div>
-    
-    <style>
-    .loading-spinner {{
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-radius: 50%;
-        border-top-color: {spinner_color};
-        animation: spin 1s ease-in-out infinite;
-    }}
-    
-    @keyframes spin {{
-        0% {{ transform: rotate(0deg); }}
-        100% {{ transform: rotate(360deg); }}
-    }}
-    </style>
-    """, unsafe_allow_html=True)
-
-# Enhanced lazy loading with smooth transitions
-def lazy_load_chart(chart_function, chart_id, data=None, button_text="Load Chart", height=300):
-    """Lazy load charts with enhanced transition animations
+# Lazy load charts on mobile
+def lazy_load_chart(chart_function, chart_id, data=None, button_text="Load Chart"):
+    """Lazy load charts on mobile devices to improve performance
     
     Args:
         chart_function: Function that renders the chart
         chart_id: Unique identifier for this chart
         data: Data to pass to the chart function
         button_text: Text for the load button
-        height: Height of the placeholder
     """
-    initialize_theme_preferences()
-    theme = get_current_theme()
-    is_mobile = is_likely_mobile()
-    reduce_motion = theme['reduce_motion']
-    
     # Initialize session state for this chart if not exists
     if f'load_{chart_id}' not in st.session_state:
-        st.session_state[f'load_{chart_id}'] = not is_mobile
-    
-    if f'loading_{chart_id}' not in st.session_state:
-        st.session_state[f'loading_{chart_id}'] = False
+        st.session_state[f'load_{chart_id}'] = not is_likely_mobile()
     
     # If already loaded or not mobile, render the chart
     if st.session_state[f'load_{chart_id}']:
-        if st.session_state[f'loading_{chart_id}']:
-            # Show loading placeholder briefly for better UX
-            loading_placeholder(height=height, text=f"Loading {chart_id}...")
-            # In a real app, we'd use a timer to change this state
-            # For demo, we'll trigger rerun automatically
-            st.session_state[f'loading_{chart_id}'] = False
-            time.sleep(0.5 if not reduce_motion else 0.1)  # Brief delay for animation
         return chart_function(data) if data is not None else chart_function()
     else:
-        # Show enhanced placeholder with load button
+        # Show placeholder with load button
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown(f"**Chart: {chart_id}**")
+            st.markdown(f"**Chart: {chart_id}** (Load to view)")
         with col2:
             if st.button(button_text, key=f"btn_{chart_id}"):
                 st.session_state[f'load_{chart_id}'] = True
-                st.session_state[f'loading_{chart_id}'] = True
-                # Request rerun to show loading state
+                # Request rerun to render the chart
                 st.experimental_rerun()
-        
-        # Show optimized placeholder
-        loading_placeholder(height=height, text="Click to load chart", show_spinner=False)
 
 # Enhanced helper function for mobile-friendly chart rendering
-def render_mobile_chart(fig, data=None, use_container_width=True, with_animation=True):
+def render_mobile_chart(fig, data=None, use_container_width=True):
     """Render a plotly chart with enhanced mobile-friendly configuration
     
     This function applies comprehensive mobile optimizations to charts
-    and supports dark mode and accessibility features
-    
-    Args:
-        fig: Plotly figure object
-        data: Optional data to simplify for mobile
-        use_container_width: Whether to use container width
-        with_animation: Whether to enable animations (respects reduce_motion setting)
     """
-    # Get device and theme settings
     device = optimize_for_device()
     is_mobile = device['is_mobile']
     
-    # Get current theme settings
-    initialize_theme_preferences()
-    theme = get_current_theme()
-    is_dark = theme['dark']
-    reduce_motion = theme['reduce_motion']
-    is_colorblind = theme['colorblind']
-    is_high_contrast = theme['high_contrast']
-    
-    # Simplify data for mobile if needed
+    # Optionally simplify data for mobile
     if data is not None and is_mobile and hasattr(data, '__len__') and len(data) > device['points_limit']:
-        # This would be implemented based on chart type
+        # Would need to recreate the figure with simplified data
+        # This is a placeholder - actual implementation depends on chart type
         pass
     
-    # Determine color scheme based on theme
-    if is_dark:
-        bg_color = "#121212"
-        paper_bg = "#1E1E1E"
-        grid_color = "#333333"
-        text_color = "#E6E6E6"
-        muted_text = "#999999"
-    else:
-        bg_color = "#f9f9fc"
-        paper_bg = "#ffffff"
-        grid_color = "#e0e0e0"
-        text_color = "#333333"
-        muted_text = "#777777"
-    
-    # Set colors for plot based on theme
-    if is_colorblind:
-        # Use colorblind-friendly palette
-        colorway = CHART_COLORS['colorblind']
-    elif is_dark:
-        # Use dark mode palette
-        colorway = CHART_COLORS['dark_mode']
-    else:
-        # Use default palette
-        colorway = CHART_COLORS['primary']
-    
-    # Override for high contrast
-    if is_high_contrast:
-        if is_dark:
-            colorway = ['#FFFFFF', '#FFFF00', '#00FFFF', '#FF00FF', '#00FF00']
-            grid_color = "#555555"
-        else:
-            colorway = ['#000000', '#0000FF', '#FF0000', '#008000', '#800080']
-            grid_color = "#AAAAAA"
-    
-    # Handle animation settings
-    animation_duration = 0 if reduce_motion else 500
-    easing = 'cubic-in-out'
-    
-    # Apply adaptive settings with device-specific values
+    # Apply mobile-friendly settings with device-specific values
     fig.update_layout(
-        # Theme and color settings
-        template="plotly_dark" if is_dark else "plotly_white",
-        colorway=colorway,
-        plot_bgcolor=bg_color,
-        paper_bgcolor=paper_bg,
-        
         # Adjust height based on device
         height=device['chart_height'],
         
@@ -574,13 +453,12 @@ def render_mobile_chart(fig, data=None, use_container_width=True, with_animation
                    b=60 if is_mobile else 40, 
                    l=40),
         
-        # Enhanced hoverlabels for touch and theme
+        # Enhanced hoverlabels for touch
         hoverlabel=dict(
-            bgcolor=paper_bg,
-            bordercolor="rgba(255,255,255,0.2)" if is_dark else "rgba(0,0,0,0.1)",
+            bgcolor="white",
             font_size=12,
             font_family="Arial",
-            font_color=text_color,
+            bordercolor="#4361EE" if is_mobile else None,  # More visible on mobile
             namelength=-1  # Show full field names
         ),
         
@@ -591,47 +469,25 @@ def render_mobile_chart(fig, data=None, use_container_width=True, with_animation
             y=1.02 if is_mobile else None,
             xanchor="right" if is_mobile else "auto",
             x=1 if is_mobile else None,
-            font=dict(size=device['font_size'], color=text_color),
-            bgcolor="rgba(30,30,30,0.7)" if is_dark else "rgba(255,255,255,0.7)",
-            bordercolor="rgba(255,255,255,0.2)" if is_dark else "rgba(0,0,0,0.1)"
+            font=dict(size=device['font_size'])
         ),
         
         # Mobile-friendly title positioning
         title=dict(
             y=0.95,  # Position title lower to avoid toolbar
             x=0.5,
-            font=dict(
-                size=device['title_size'], 
-                color=text_color, 
-                family='Arial, sans-serif'
-            )
+            font=dict(size=device['title_size'], color='#000000', family='Arial, sans-serif')
         ),
         
-        # Ensure fonts are readable based on theme
+        # Ensure fonts are readable on mobile
         font=dict(
             size=device['font_size'],
-            color=text_color,
+            color='#000000',
             family='Arial, sans-serif'
-        ),
-        
-        # Animation settings respecting accessibility preferences
-        transition_duration=animation_duration,
-        transition_easing=easing,
-        
-        # Improved grid and axis styling
-        xaxis=dict(
-            gridcolor=grid_color,
-            zerolinecolor=grid_color,
-            tickfont=dict(color=muted_text)
-        ),
-        yaxis=dict(
-            gridcolor=grid_color,
-            zerolinecolor=grid_color,
-            tickfont=dict(color=muted_text)
         )
     )
     
-    # Enhanced config options for better experience
+    # Enhanced config options for better mobile experience
     config = {
         'scrollZoom': False,                      # Disable scroll zooming on mobile
         'displayModeBar': 'hover',                # Show toolbar only on hover
@@ -641,24 +497,8 @@ def render_mobile_chart(fig, data=None, use_container_width=True, with_animation
         # Remove complex interactions on mobile that are hard with touch
         'modeBarButtonsToRemove': [
             'select2d', 'lasso2d', 'autoScale2d'
-        ] if is_mobile else [],
-        # Disable animations if reduce_motion is enabled
-        'staticPlot': reduce_motion and is_mobile,  # Complete disable of interactivity for reduce_motion on mobile
+        ] if is_mobile else []
     }
-    
-    # For improved accessibility with high contrast mode
-    if is_high_contrast:
-        # Update line width for better visibility
-        if hasattr(fig, 'data'):
-            for trace in fig.data:
-                if hasattr(trace, 'line') and trace.line:
-                    if hasattr(trace.line, 'width'):
-                        trace.line.width = 3  # Thicker lines for visibility
-    
-    # Add a subtle loading animation before rendering final chart
-    if with_animation and not reduce_motion:
-        loading_placeholder(height=device['chart_height'], text="Preparing visualization...")
-        time.sleep(0.3)  # Brief delay for visual feedback
     
     # Render the chart with the improved config
     return st.plotly_chart(fig, use_container_width=use_container_width, config=config)
