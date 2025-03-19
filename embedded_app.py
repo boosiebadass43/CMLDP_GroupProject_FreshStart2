@@ -44,40 +44,48 @@ def add_vertical_space(height=1):
     """Add vertical space with a multiplier of 0.5rem"""
     st.markdown(f"<div style='height:{height*0.5}rem'></div>", unsafe_allow_html=True)
 
-def card_container(content_function, title=None, icon=None, accent_color=None):
-    """Creates an enhanced card container with proper spacing and styling
-    
+def metric_card(title, value, subtitle, icon=None, accent_color=None):
+    """Creates a complete metric card with value and subtitle
+
     Args:
-        content_function: Function that renders the card content
-        title: Optional title for the card
+        title: Title for the card
+        value: Main value to display (can include units)
+        subtitle: Subtitle text for context
         icon: Optional icon for the card title
         accent_color: Optional accent color for the card (hex code)
     """
-    # Create a container first to encapsulate all content
-    container = st.container()
+    # Check if modern mode is enabled
+    is_modern = 'modern_mode' in st.session_state and st.session_state.modern_mode
     
-    # Then add the card styling and content inside that container
-    with container:
-        # Create card with optional styling based on parameters
-        if st.session_state.modern_mode and (title or icon or accent_color):
-            # Modern card with enhanced styling
-            accent_style = f"border-left: 4px solid {accent_color};" if accent_color else ""
-            icon_html = f"{icon} " if icon else ""
-            
-            st.markdown(f"<div class='card' style='{accent_style}'>", unsafe_allow_html=True)
-            
-            # Add title if provided
-            if title:
-                st.markdown(f"<h3 class='card-title'>{icon_html}{title}</h3>", unsafe_allow_html=True)
-                st.markdown("<hr style='margin: 0.5rem 0 1rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
-            
-            content_function()
-        else:
-            # Standard card
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            content_function()
-            
-        st.markdown("</div>", unsafe_allow_html=True)
+    # For modern cards
+    if is_modern:
+        border_style = f"border-left: 4px solid {accent_color};" if accent_color else ""
+        icon_prefix = f"{icon} " if icon else ""
+        
+        st.markdown(f"""
+        <div style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.08);
+                    padding: 20px; margin-bottom: 20px; height: 170px; {border_style}">
+            <h3 style="margin-top: 0; font-weight: 600; font-size: 1.1rem; margin-bottom: 15px; color: #333;">{icon_prefix}{title}</h3>
+            <div style="display: flex; flex-direction: column; justify-content: center; height: 100px;">
+                <div style="font-size: 1.9rem; font-weight: bold; color: {accent_color if accent_color else '#4361EE'}; 
+                        margin-bottom: 10px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; 
+                        text-align: center; word-wrap: break-word;">{value}</div>
+                <div style="color: #666; font-size: 0.9rem; text-align: center;">{subtitle}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Classic card
+        st.markdown(f"""
+        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                    padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
+            <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">{title}</div>
+            <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                    line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{value}</div>
+            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{subtitle}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Smart Device Detection
 def is_likely_mobile():
@@ -3205,40 +3213,20 @@ def main():
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
                 
-                # Function to render metric card content
-                def render_complexity_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{avg_complexity}/5</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Rated by {len(filtered_data)} respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_complexity_card,
+                # Use simplified direct metric card
+                metric_card(
                     title="Average Complexity Rating",
+                    value=f"{avg_complexity}/5",
+                    subtitle=f"Rated by {len(filtered_data)} respondents",
                     icon="⭐",
                     accent_color="#4361EE"
                 )
             except:
-                # Function to render error card content
-                def render_complexity_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_complexity_error_card,
+                # Error state card
+                metric_card(
                     title="Average Complexity Rating",
+                    value="N/A",
+                    subtitle="Data not available",
                     icon="⭐",
                     accent_color="#8A8A8A"
                 )
@@ -3249,50 +3237,33 @@ def main():
                 timeline_pct = round(filtered_data['timeline_first_contract'].value_counts().iloc[0] / len(filtered_data) * 100)
                 
                 # Adaptive font size based on timeline text length
-                timeline_font_size = 2.2
+                timeline_font_size = 1.9
                 if len(most_common_timeline) > 15:
-                    timeline_font_size = 2.0
+                    timeline_font_size = 1.7
                 if len(most_common_timeline) > 20:
-                    timeline_font_size = 1.8
+                    timeline_font_size = 1.5
                 if len(most_common_timeline) > 25:
-                    timeline_font_size = 1.6
+                    timeline_font_size = 1.3
                 if len(most_common_timeline) > 30:
-                    timeline_font_size = 1.4
+                    timeline_font_size = 1.1
                 
-                # Function to render timeline card content
-                def render_timeline_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: {timeline_font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{most_common_timeline}</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{timeline_pct}% of respondents</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                # Create a custom value with adjusted font size
+                value_html = f"<span style=\"font-size: {timeline_font_size}rem;\">{most_common_timeline}</span>"
                 
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_timeline_card,
+                # Use simplified direct metric card
+                metric_card(
                     title="Most Common Timeline",
+                    value=value_html,
+                    subtitle=f"{timeline_pct}% of respondents",
                     icon="⏱️",
                     accent_color="#3A86FF"
                 )
             except:
-                # Function to render error card content
-                def render_timeline_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_timeline_error_card,
+                # Error state card
+                metric_card(
                     title="Most Common Timeline",
+                    value="N/A",
+                    subtitle="Data not available",
                     icon="⏱️",
                     accent_color="#8A8A8A"
                 )
@@ -3336,61 +3307,34 @@ def main():
                     if len(cleaned_resource) > 50:
                         font_size = 1.1
                     
-                    # Function to render resource card content
-                    def render_resource_card():
-                        st.markdown(f"""
-                        <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                            <div style="font-size: {font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
-                                    line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{cleaned_resource}</div>
-                            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{percentage}% of resource mentions</div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                    # Create a custom value with adjusted font size
+                    value_html = f"<span style=\"font-size: {font_size}rem;\">{cleaned_resource}</span>"
                     
-                    # Use enhanced card container with title and icon
-                    card_container(
-                        content_function=render_resource_card,
+                    # Use simplified direct metric card
+                    metric_card(
                         title="Most Requested Resource",
+                        value=value_html,
+                        subtitle=f"{percentage}% of resource mentions",
                         icon="💡",
                         accent_color="#F72585"
                     )
                 else:
-                    # Function to render empty resource card
-                    def render_empty_resource_card():
-                        st.markdown(f"""
-                        <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                            <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                    line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                            <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">No resource data available</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Use enhanced card container with title and icon
-                    card_container(
-                        content_function=render_empty_resource_card,
+                    # Error state card
+                    metric_card(
                         title="Most Requested Resource",
+                        value="N/A",
+                        subtitle="No resource data available",
                         icon="💡",
                         accent_color="#8A8A8A"
                     )
             except Exception as e:
                 logger.error(f"Error displaying most requested resource: {str(e)}")
                 
-                # Function to render error card
-                def render_resource_error_card():
-                    st.markdown(f"""
-                    <div style="text-align: center; height: 130px; display: flex; flex-direction: column;">
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
-                                overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
-                                line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Error processing data</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Use enhanced card container with title and icon
-                card_container(
-                    content_function=render_resource_error_card,
+                # Error state card
+                metric_card(
                     title="Most Requested Resource",
+                    value="N/A",
+                    subtitle="Error processing data",
                     icon="💡",
                     accent_color="#8A8A8A"
                 )
