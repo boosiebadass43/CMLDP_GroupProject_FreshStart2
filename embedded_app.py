@@ -970,12 +970,77 @@ base_css = """
     max-width: 1200px !important;  /* Prevent excess width on large screens */
 }
 
+/* Section separators with enhanced visual hierarchy */
+.stMarkdown h2 {
+    margin-top: 2.5rem !important;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid rgba(67, 97, 238, 0.1) !important;
+    position: relative !important;
+}
+
+/* Add visual indicator to section headers */
+.stMarkdown h2::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), rgba(67, 97, 238, 0.2));
+}
+
+/* Section content grouping */
+.stMarkdown + div {
+    position: relative;
+}
+
+/* Section background panels */
+.main [data-testid="stVerticalBlock"] {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .main [data-testid="stVerticalBlock"] {
+    background: rgba(30, 30, 30, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Tab sections with enhanced styling */
+.stTabs [data-baseweb="tab-panel"] {
+    padding: 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme="dark"] .stTabs [data-baseweb="tab-panel"] {
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-top: none !important;
+    background: rgba(30, 30, 30, 0.8) !important;
+}
+
+/* Consistent text formatting */
+.stMarkdown p {
+    line-height: 1.6 !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Card group layouts */
+.stColumnContainer {
+    gap: 1rem !important;
+}
+
 /* Consistent section spacing */
 .element-container {
     margin-bottom: 1.5rem !important;
 }
-
-/* Proper paragraph spacing */
 p {
     margin-bottom: 1rem !important;
     line-height: 1.6 !important;
@@ -3214,15 +3279,116 @@ def main():
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* Header styling */
+    /* Enhanced Header styling */
     h1, h2, h3, h4, h5 {
         color: #333333;
         margin-bottom: 0.5rem;
+        position: relative;
+    }
+    
+    /* Dashboard header section */
+    .dashboard-header {
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -2rem;
+        right: -2rem;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(67, 97, 238, 0.05), rgba(67, 97, 238, 0.02));
+        z-index: -1;
+        border-radius: 12px;
+    }
+    
+    .header-accent {
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        height: 4px;
+        width: 120px;
+        background: linear-gradient(90deg, #4361EE, rgba(67, 97, 238, 0.2));
+        border-radius: 2px;
+    }
+    
+    /* Section headers with visual indicator */
+    h2 {
+        padding-bottom: 0.5rem;
+        margin-top: 2rem !important;
+        margin-bottom: 1.5rem !important;
+        border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+    }
+    
+    h2::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(90deg, #4361EE, rgba(67, 97, 238, 0.2));
     }
 
-    /* Ensure proper spacing */
+    /* Improved section containers and spacing */
     .element-container {
         margin-bottom: 1.5rem !important;
+    }
+    
+    /* Content sections with subtle backgrounds */
+    .stTabs {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Tab panels with subtle background */
+    [data-baseweb="tab-panel"] {
+        background: rgba(248, 249, 250, 0.7);
+        padding: 1.5rem !important;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-top: none;
+    }
+    
+    /* Section content with subtle grouping */
+    .stMarkdown + div {
+        position: relative;
+    }
+    
+    /* Chart and visualization containers */
+    [data-testid="stBlock"] > div > [data-testid="element-container"] > div > div > div {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
+    }
+    
+    /* Hover effects for interactive elements */
+    [role="button"], 
+    button,
+    .stCheckbox label,
+    .stSelectbox label {
+        transition: all 0.2s ease;
+    }
+    
+    [role="button"]:hover, 
+    button:hover {
+        transform: translateY(-1px);
+    }
+    
+    /* Better distinction between groups of controls */
+    .stCheckbox, .stRadio, .stSelectbox, .stSlider {
+        padding: 0.5rem;
+        background: rgba(248, 249, 250, 0.7);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
     }
 
     /* Custom component styling */
@@ -3239,31 +3405,77 @@ def main():
         margin-bottom: 10px;
     }
 
+    /* Enhanced insight highlights with better visual hierarchy */
     .insight-highlight {
-        padding: 10px;
+        padding: 15px;
         background-color: #F0F4FF;
         border-left: 3px solid #4B5CFF;
         margin-bottom: 15px;
+        border-radius: 0 8px 8px 0;
+        box-shadow: 0 2px 10px rgba(75, 92, 255, 0.05);
+        position: relative;
+        transition: all 0.2s ease;
+    }
+    
+    .insight-highlight::before {
+        content: "📊 Key Insight";
+        display: block;
+        font-weight: 600;
+        color: #4B5CFF;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+    }
+    
+    .insight-highlight:hover {
+        transform: translateX(2px);
+        box-shadow: 0 4px 12px rgba(75, 92, 255, 0.08);
     }
 
-    /* Step styling for recommendations */
+    /* Enhanced step styling for recommendations with visual flow */
     .step-item {
         display: flex;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         align-items: flex-start;
+        position: relative;
+        padding: 15px;
+        background: rgba(248, 249, 255, 0.7);
+        border-radius: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 8px rgba(75, 92, 255, 0.05);
+        border: 1px solid rgba(75, 92, 255, 0.1);
+    }
+    
+    .step-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(75, 92, 255, 0.08);
+    }
+    
+    /* Visual connector between steps */
+    .step-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        bottom: -25px;
+        left: 15px;
+        width: 2px;
+        height: 25px;
+        background: linear-gradient(to bottom, rgba(75, 92, 255, 0.5), rgba(75, 92, 255, 0.1));
+        z-index: 1;
     }
 
     .step-number {
-        background-color: #4B5CFF;
+        background: linear-gradient(135deg, #4B5CFF, #6979FF);
         color: white;
         border-radius: 50%;
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-right: 15px;
         flex-shrink: 0;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(75, 92, 255, 0.2);
     }
 
     .step-content {
@@ -3272,12 +3484,14 @@ def main():
 
     .step-title {
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         color: #333333;
+        font-size: 1.1rem;
     }
 
     .step-description {
         color: #555555;
+        line-height: 1.5;
     }
 
     /* Container overflow fixes */
@@ -3285,17 +3499,109 @@ def main():
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
     }
+    
+    /* Enhanced sidebar styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, rgba(248, 249, 255, 0.9), rgba(248, 249, 255, 0.7));
+        border-right: 1px solid rgba(75, 92, 255, 0.1);
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    /* Sidebar headings */
+    [data-testid="stSidebar"] h3 {
+        position: relative;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+    }
+    
+    [data-testid="stSidebar"] h3::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(90deg, #4B5CFF, rgba(75, 92, 255, 0.2));
+    }
+    
+    /* Custom scrollbar styling for modern browsers */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgba(75, 92, 255, 0.2);
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(75, 92, 255, 0.4);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    
+    /* Dark mode scrollbar */
+    @media (prefers-color-scheme: dark) {
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(75, 92, 255, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 92, 255, 0.5);
+        }
+    }
 
-    /* Fix Executive Summary expander */
+    /* Enhanced expander styling */
     .streamlit-expanderHeader {
         font-size: 1.2rem !important;
         font-weight: 600 !important;
+        background: linear-gradient(90deg, rgba(75, 92, 255, 0.05), rgba(0, 0, 0, 0)) !important;
+        padding: 12px 15px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        border-left: 3px solid rgba(75, 92, 255, 0.3) !important;
+    }
+    
+    /* Hover effect for expander headers */
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(90deg, rgba(75, 92, 255, 0.08), rgba(0, 0, 0, 0)) !important;
+        border-left: 3px solid rgba(75, 92, 255, 0.5) !important;
     }
 
-    /* Ensure the expander content has proper spacing */
+    /* Ensure the expander content has proper spacing and styling */
     .streamlit-expanderContent {
-        padding: 10px 0 !important;
+        padding: 15px !important;
         overflow: visible !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+        border-radius: 0 0 8px 8px !important;
+        margin-top: -5px !important;
+        border: 1px solid rgba(75, 92, 255, 0.1) !important;
+        border-top: none !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    }
+    
+    /* Visual indicator for expanded state */
+    [data-testid="stExpander"][aria-expanded="true"] .streamlit-expanderHeader {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-left: 3px solid rgba(75, 92, 255, 0.8) !important;
+        margin-bottom: 0 !important;
     }
 
     /* Fix text wrapping and prevent overflow */
