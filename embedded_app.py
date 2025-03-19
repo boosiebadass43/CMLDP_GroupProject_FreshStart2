@@ -3053,23 +3053,27 @@ def main():
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
                 
-                # Direct card using HTML with flex layout for consistency
+                # Direct card using HTML with consistent styling
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">{avg_complexity}/5</div>
-                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Rated by {len(filtered_data)} respondents</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{avg_complexity}/5</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Rated by {len(filtered_data)} respondents</div>
                 </div>
                 """, unsafe_allow_html=True)
             except:
-                # Direct card using HTML for error case with flex layout
+                # Direct card using HTML for error case with consistent styling
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Data not available</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -3078,23 +3082,38 @@ def main():
                 most_common_timeline = filtered_data['timeline_first_contract'].value_counts().index[0]
                 timeline_pct = round(filtered_data['timeline_first_contract'].value_counts().iloc[0] / len(filtered_data) * 100)
                 
-                # Direct card using HTML with flex layout for consistency
+                # Adaptive font size based on timeline text length
+                timeline_font_size = 2.2
+                if len(most_common_timeline) > 15:
+                    timeline_font_size = 2.0
+                if len(most_common_timeline) > 20:
+                    timeline_font_size = 1.8
+                if len(most_common_timeline) > 25:
+                    timeline_font_size = 1.6
+                if len(most_common_timeline) > 30:
+                    timeline_font_size = 1.4
+                
+                # Direct card using HTML with dynamic font sizing
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis;">{most_common_timeline}</div>
-                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">{timeline_pct}% of respondents</div>
+                    <div style="font-size: {timeline_font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{most_common_timeline}</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{timeline_pct}% of respondents</div>
                 </div>
                 """, unsafe_allow_html=True)
             except:
-                # Direct card using HTML for error case with flex layout
+                # Direct card using HTML for error case with consistent styling
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Data not available</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Data not available</div>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -3126,13 +3145,26 @@ def main():
                     if "Centralized getting started portal with step-by-step guidance" in cleaned_resource:
                         cleaned_resource = "Getting started portal"
                     
-                    # Direct card using HTML with improved flex layout and text control
+                    # Adaptive font size based on text length
+                    font_size = 1.9
+                    if len(cleaned_resource) > 20:
+                        font_size = 1.7
+                    if len(cleaned_resource) > 30:
+                        font_size = 1.5
+                    if len(cleaned_resource) > 40:
+                        font_size = 1.3
+                    if len(cleaned_resource) > 50:
+                        font_size = 1.1
+                    
+                    # Direct card using HTML with dynamic font scaling
                     st.markdown(f"""
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                                 padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">{cleaned_resource}</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto;">{percentage}% of resource mentions</div>
+                        <div style="font-size: {font_size}rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                                  overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; 
+                                  line-height: 1.2; word-wrap: break-word; padding: 0 5px;">{cleaned_resource}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">{percentage}% of resource mentions</div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
@@ -3141,8 +3173,10 @@ def main():
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                                 padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">N/A</div>
-                        <div style="color: #666; font-size: 0.9rem; margin-top: auto;">No resource data available</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                                  overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                                  line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">No resource data available</div>
                     </div>
                     """, unsafe_allow_html=True)
             except Exception as e:
@@ -3153,8 +3187,10 @@ def main():
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Error processing data</div>
+                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; 
+                              overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;
+                              line-height: 1.2; word-wrap: break-word; padding: 0 5px;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto; white-space: nowrap;">Error processing data</div>
                 </div>
                 """, unsafe_allow_html=True)
         
