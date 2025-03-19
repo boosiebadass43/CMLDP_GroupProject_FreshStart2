@@ -32,10 +32,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize session state for modern mode toggle
-if 'modern_mode' not in st.session_state:
-    st.session_state.modern_mode = True
-
 # HELPER FUNCTIONS FOR CONSISTENT SPACING AND LAYOUT
 
 def section_header(title, description=None):
@@ -274,7 +270,12 @@ def render_mobile_chart(fig, data=None, use_container_width=True):
 
 # Function to toggle modern mode
 def toggle_modern_mode():
-    st.session_state.modern_mode = not st.session_state.modern_mode
+    # Initialize if it doesn't exist
+    if 'modern_mode' not in st.session_state:
+        st.session_state.modern_mode = True
+    else:
+        # Toggle the current state
+        st.session_state.modern_mode = not st.session_state.modern_mode
 
 # Modern CSS styles with enhanced visual appeal
 def get_modern_css():
@@ -1093,8 +1094,8 @@ svg text {
 </style>
 """
 
-# Apply CSS based on mode setting
-if st.session_state.modern_mode:
+# Apply CSS based on mode setting - with safe fallback
+if 'modern_mode' in st.session_state and st.session_state.modern_mode:
     st.markdown(f"""
     <style>
     {base_css}
@@ -2628,6 +2629,11 @@ def main():
     # Add modern mode toggle in sidebar
     with st.sidebar:
         st.markdown("### Dashboard Settings")
+        
+        # Check if modern_mode exists in session state before accessing it
+        if 'modern_mode' not in st.session_state:
+            st.session_state.modern_mode = True
+            
         st.checkbox("Modern UI Mode", value=st.session_state.modern_mode, key="toggle_modern_ui", on_change=toggle_modern_mode)
         st.markdown("---")
         st.markdown("<small>Toggle to switch between modern and classic UI</small><br><small>⚠️ Changes will apply after you interact with the dashboard</small>", unsafe_allow_html=True)
