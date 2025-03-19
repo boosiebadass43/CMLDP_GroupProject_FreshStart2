@@ -31,12 +31,17 @@ CHART_COLORS = {
     'dark_mode': ['#7EB6FF', '#B5FFFF', '#94FBAB', '#FFDD94', '#FFB7D5', '#E8CFF8', '#DDDDDD']
 }
 
-# Set page configuration with proper spacing
+# Set page configuration with proper spacing - ensure wide mode is default
 st.set_page_config(
     page_title="Small Business Federal Contracting Dashboard",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': "Small Business Federal Contracting Dashboard"
+    }
 )
 
 # HELPER FUNCTIONS FOR CONSISTENT SPACING AND LAYOUT
@@ -322,7 +327,7 @@ def optimize_for_device():
             base_config.update({
                 'column_count': 2,
                 'card_columns': 2,
-                'chart_height': 400,
+                'chart_height': 500,  # Increased from 400 to 500 to match desktop
             })
         else:  # Desktop
             base_config.update({
@@ -2566,7 +2571,7 @@ class SmallBusinessDashboard:
                 )
                 
                 fig.update_layout(
-                    height=400,
+                    height=500,  # Increased from 400 to 500 to match other charts
                     xaxis_title="Respondent Type",
                     yaxis_title="Average Complexity (1-5)",
                     xaxis={
@@ -2653,7 +2658,7 @@ class SmallBusinessDashboard:
                 )
                 
                 fig.update_layout(
-                    height=400,
+                    height=500,  # Increased from 400 to 500 to match other charts
                     xaxis={
                         'tickfont': {'size': 14, 'color': '#000000'},
                         'title_font': {'size': 15, 'color': '#000000'}
@@ -3361,13 +3366,26 @@ def main():
         position: relative;
     }
     
-    /* Chart and visualization containers */
+    /* Chart and visualization containers with consistent sizing */
     [data-testid="stBlock"] > div > [data-testid="element-container"] > div > div > div {
         background: white;
         border-radius: 8px;
         padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease-in-out;
+    }
+    
+    /* Ensure charts have consistent height and spacing */
+    .js-plotly-plot {
+        width: 100% !important;
+        min-height: 500px !important;
+    }
+    
+    /* Ensure charts maintain aspect ratio */
+    .js-plotly-plot .plot-container {
+        box-sizing: border-box !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     
     /* Hover effects for interactive elements */
