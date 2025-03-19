@@ -3053,23 +3053,23 @@ def main():
             try:
                 avg_complexity = round(filtered_data['onboarding_complexity'].mean(), 1)
                 
-                # Direct card using HTML
+                # Direct card using HTML with flex layout for consistency
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{avg_complexity}/5</div>
-                    <div style="color: #666; font-size: 0.9rem;">Rated by {len(filtered_data)} respondents</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">{avg_complexity}/5</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Rated by {len(filtered_data)} respondents</div>
                 </div>
                 """, unsafe_allow_html=True)
             except:
-                # Direct card using HTML for error case
+                # Direct card using HTML for error case with flex layout
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Average Complexity Rating</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem;">Data not available</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Data not available</div>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -3078,23 +3078,23 @@ def main():
                 most_common_timeline = filtered_data['timeline_first_contract'].value_counts().index[0]
                 timeline_pct = round(filtered_data['timeline_first_contract'].value_counts().iloc[0] / len(filtered_data) * 100)
                 
-                # Direct card using HTML
+                # Direct card using HTML with flex layout for consistency
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">{most_common_timeline}</div>
-                    <div style="color: #666; font-size: 0.9rem;">{timeline_pct}% of respondents</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis;">{most_common_timeline}</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">{timeline_pct}% of respondents</div>
                 </div>
                 """, unsafe_allow_html=True)
             except:
-                # Direct card using HTML for error case
+                # Direct card using HTML for error case with flex layout
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px;">
+                            padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Common Timeline</div>
-                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px;">N/A</div>
-                    <div style="color: #666; font-size: 0.9rem;">Data not available</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                    <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Data not available</div>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -3126,34 +3126,34 @@ def main():
                     if "Centralized getting started portal with step-by-step guidance" in cleaned_resource:
                         cleaned_resource = "Getting started portal"
                     
-                    # Direct card using HTML with flex layout to ensure proper alignment
+                    # Direct card using HTML with improved flex layout and text control
                     st.markdown(f"""
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                                 padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">{cleaned_resource}</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">{cleaned_resource}</div>
                         <div style="color: #666; font-size: 0.9rem; margin-top: auto;">{percentage}% of resource mentions</div>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
-                    # Fallback for when no data is available
+                    # Fallback for when no data is available with consistent styling
                     st.markdown(f"""
                     <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                                 padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                         <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                        <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">N/A</div>
                         <div style="color: #666; font-size: 0.9rem; margin-top: auto;">No resource data available</div>
                     </div>
                     """, unsafe_allow_html=True)
             except Exception as e:
                 logger.error(f"Error displaying most requested resource: {str(e)}")
                 
-                # Direct card using HTML for error case
+                # Direct card using HTML for error case with improved text overflow control
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                             padding: 20px; text-align: center; height: 170px; margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div style="font-weight: bold; color: #555; font-size: 1rem; margin-bottom: 10px;">Most Requested Resource</div>
-                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1;">N/A</div>
+                    <div style="font-size: 1.9rem; font-weight: bold; color: #4361EE; margin-bottom: 8px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center;">N/A</div>
                     <div style="color: #666; font-size: 0.9rem; margin-top: auto;">Error processing data</div>
                 </div>
                 """, unsafe_allow_html=True)
