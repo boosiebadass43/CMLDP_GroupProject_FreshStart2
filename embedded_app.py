@@ -74,7 +74,7 @@ def is_likely_mobile():
     st.markdown(device_script, unsafe_allow_html=True)
     
     # Check for mobile parameter in URL
-    mobile_param = st.experimental_get_query_params().get('mobile', [False])[0]
+    mobile_param = st.query_params.get('mobile', False)
     return mobile_param == 'true'
 
 # Function to handle device-specific optimizations
