@@ -3055,72 +3055,45 @@ def main():
     # Application header
     html_content('<div class="main-header">📊 Small Business Federal Contracting Dashboard</div>')
     
-    # Executive Summary with mobile-friendly custom expander
-    st.markdown(f"""
+    # Add custom CSS for insight boxes
+    st.markdown("""
     <style>
-    .custom-expander {{
-        margin-bottom: 30px;
-        background-color: white;
-        border-radius: 5px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }}
-    .custom-expander-header {{
+    .insight-box {
+        margin: 15px 0;
         padding: 12px 15px;
-        background-color: #f0f2f6;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }}
-    .custom-expander-content {{
-        padding: 15px;
-        display: none;
-    }}
-    .custom-expander.expanded .custom-expander-content {{
-        display: block;
-    }}
+        background-color: #f8f9fa;
+        border-left: 4px solid #4361EE;
+        border-radius: 4px;
+    }
+    .emoji-icon {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
     </style>
-    <div class="custom-expander" id="exec-summary-expander">
-        <div class="custom-expander-header" onclick="toggleExpander('exec-summary-expander')">
-            📋 Executive Summary <span id="exec-arrow">▼</span>
-        </div>
-        <div class="custom-expander-content">
-            <h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>
-            
-            <p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>
-            
-            <div class="insight-box">
-                <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
-                understanding where to begin, and meeting cybersecurity requirements.
-            </div>
-            
-            <div class="insight-box">
-                <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
-                indicating significant onboarding barriers.
-            </div>
-            
-            <div class="insight-box">
-                <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
-                is the most requested resource across all stakeholder groups.
-            </div>
-        </div>
-    </div>
-
-    <script>
-    function toggleExpander(id) {{
-        const expander = document.getElementById(id);
-        expander.classList.toggle('expanded');
-        const arrow = document.getElementById('exec-arrow');
-        if (expander.classList.contains('expanded')) {{
-            arrow.innerText = '▼';
-        }} else {{
-            arrow.innerText = '►';
-        }}
-    }}
-    </script>
     """, unsafe_allow_html=True)
+    
+    # Executive Summary using Streamlit's built-in expander
+    with st.expander("📋 Executive Summary", expanded=False):
+        st.markdown("<h3 style='margin-bottom: 15px;'>Key Insights for Policy Makers</h3>", unsafe_allow_html=True)
+        
+        st.markdown(f"<p style='margin-bottom: 10px;'>This dashboard analyzes survey data from <b>{len(dashboard.data)}</b> stakeholders in the federal contracting space to identify challenges facing small businesses during the onboarding process for federal contracts.</p>", unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="insight-box">
+            <span class="emoji-icon">🔍</span> <b>Top Challenge:</b> Small businesses struggle most with navigating complex registration systems, 
+            understanding where to begin, and meeting cybersecurity requirements.
+        </div>
+        
+        <div class="insight-box">
+            <span class="emoji-icon">⏱️</span> <b>Time to First Contract:</b> Most small businesses report taking 2+ years to secure their first federal contract, 
+            indicating significant onboarding barriers.
+        </div>
+        
+        <div class="insight-box">
+            <span class="emoji-icon">💡</span> <b>Recommended Solution:</b> A centralized "getting started" portal with step-by-step guidance 
+            is the most requested resource across all stakeholder groups.
+        </div>
+        """, unsafe_allow_html=True)
     
     # IMPORTANT: Place a spacer after the executive summary to ensure separation from tabs
     st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
