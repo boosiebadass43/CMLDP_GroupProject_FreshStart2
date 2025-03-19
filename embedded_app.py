@@ -1106,10 +1106,9 @@ def get_modern_css():
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: var(--shadow-sm);
         }}
     }}
-        box-shadow: var(--shadow-sm);
-    }
     
     [data-testid="stMetricValue"] {
         font-size: 1.8rem !important;
